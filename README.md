@@ -31,7 +31,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: eic/setup-cvmfs@main
     - name: Setup CernVM-FS
-      run: spack find
+      run: cat /etc/cvmfs/default.local && ls /cvmfs/eic.opensciencegrid.org/
 ```
 
 ## What Does This Action Do?
