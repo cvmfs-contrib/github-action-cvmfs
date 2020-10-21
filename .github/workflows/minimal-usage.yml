@@ -1,4 +1,4 @@
-name: Test setup-cvmfs action
+name: Test setup-cvmfs action (minimal usage)
 on: [push, pull_request]
 jobs:
   build:
