@@ -4,7 +4,7 @@ This GitHub Action sets up CernVM-FS for use in GitHub Workflows.
 ## Instructions
 You can use this GitHub Action in a workflow in your own repository by with `uses: eic/setup-cvmfs@main`.
 
-For example, the file `.github/workflows/action.yml` could include the follwwing stanza:
+For example, the file `.github/workflows/tests.yml` could include the following stanza:
 ```yaml
 jobs:
   build:
@@ -31,7 +31,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: eic/setup-cvmfs@main
     - name: Setup CernVM-FS
-      run: cat /etc/cvmfs/default.local && ls /cvmfs/eic.opensciencegrid.org/
+      run: spack find
 ```
 
 ## What Does This Action Do?
