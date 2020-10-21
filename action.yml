@@ -1,0 +1,18 @@
+name: 'CernVM-FS'
+description: 'Load the CernVM-FS filesystem at /cvmfs'
+branding:
+  icon: 'database'
+inputs:
+  cvmfs_repositories:
+    description: 'List of cvmfs repositories to load'
+    required: false
+    default: 'atlas.cern.ch,atlas-condb.cern.ch,grid.cern.ch'
+  cvmfs_http_proxy:
+    description: 'Proxy for cvmfs repositories'
+    required: false
+    default: 'DIRECT'
+runs:
+  using: "composite"
+  steps: 
+    - run: ${{ github.action_path }}/setup-cvmfs.sh
+      shell: bash
