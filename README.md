@@ -20,7 +20,7 @@ The following parameters are supported:
 
 ## Minimal Example
 
-The following minimal example, which is also a workflow in this repository at [.github/workflows/action.yml](https://github.com/eic/setup-cvmfs/.github/workflows/action.yml), setups up CernVM-FS and lists the contents of the `/cvmfs/eic.opensciencegrid.org` directory.
+The following minimal example, which is also a workflow in this repository at [.github/workflows/action.yml](https://github.com/eic/setup-cvmfs/tree/main/.github/workflows/action.yml), setups up CernVM-FS and lists the contents of the `/cvmfs/eic.opensciencegrid.org` directory.
 ```yaml
 name: Test setup-cvmfs action
 on: [push, pull_request]
