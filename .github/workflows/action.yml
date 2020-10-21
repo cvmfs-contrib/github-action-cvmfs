@@ -1,0 +1,10 @@
+name: Test setup-cvmfs action
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: eic/setup-cvmfs@main
+    - name: Setup CernVM-FS
+      run: cat /etc/cvmfs/default.local && ls /cvmfs/eic.opensciencegrid.org/
