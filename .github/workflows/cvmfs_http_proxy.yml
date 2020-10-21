@@ -1,0 +1,12 @@
+name: Test setup-cvmfs action (with cvmfs_http_proxy)
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: eic/setup-cvmfs@main
+      with:
+        cvmfs_http_proxy: 'auto'
+    - name: Setup CernVM-FS
+      run: cat /etc/cvmfs/default.local && ls /cvmfs/eic.opensciencegrid.org/
