@@ -1,5 +1,5 @@
 # GitHub Action: eic/setup-cvmfs
-This GitHub Action sets up CernVM-FS for use in GitHub Workflows. 
+This GitHub Action sets up CernVM-FS for use in GitHub Workflows.
 
 ## Instructions
 You can use this GitHub Action in a workflow in your own repository by with `uses: eic/setup-cvmfs@main`.
@@ -33,3 +33,13 @@ jobs:
     - name: Setup CernVM-FS
       run: cat /etc/cvmfs/default.local && ls /cvmfs/eic.opensciencegrid.org/
 ```
+
+## What Does This Action Do?
+
+This GitHub Action installs the [CernVM-FS debian package](https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest_all.deb), and configures it with the `CVMFS_REPOSITORIES` and `CVMFS_HTTP_PROXY` settings optionally specified as arguments. It configures autofs to automatically mount the cvmfs repositories that are accessed.
+
+## Limitations
+
+This GitHub Action makes no attempt at caching. Frequent use may incur overhead on the CernVM-FS servers you are accessing.
+
+This GitHub Action is only expected to work in workflows that [run on](https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on) ubuntu targets (and even then likely only `ubuntu-latest`). This exludes the `macos` and `windows` targets.
