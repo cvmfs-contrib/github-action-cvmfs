@@ -2,6 +2,7 @@ name: 'CernVM-FS'
 description: 'Load the CernVM-FS filesystem at /cvmfs'
 branding:
   icon: 'database'
+  color: 'blue'
 inputs:
   cvmfs_repositories:
     description: 'List of cvmfs repositories to load'
