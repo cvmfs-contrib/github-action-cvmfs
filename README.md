@@ -38,8 +38,8 @@ jobs:
 
 This GitHub Action installs the [CernVM-FS debian package](https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest_all.deb), and configures it with the `CVMFS_REPOSITORIES` and `CVMFS_HTTP_PROXY` settings optionally specified as arguments. It configures autofs to automatically mount the cvmfs repositories that are accessed.
 
-## Limitations
+To avoid any overhead on the CernVM-FS stratum 1 servers that you are accessing, this GitHub Action uses the [OpenHTC](https://openhtc.io) caching edge servers.
 
-This GitHub Action makes no attempt at caching. Frequent use may incur overhead on the CernVM-FS servers you are accessing.
+## Limitations
 
 This GitHub Action is only expected to work in workflows that [run on](https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on) ubuntu targets (and even then likely only `ubuntu-latest`). This exludes the `macos` and `windows` targets.
