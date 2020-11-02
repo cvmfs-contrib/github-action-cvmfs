@@ -5,6 +5,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: eic/setup-cvmfs@main
+    - uses: cvmfs-contrib/setup-cvmfs@main
     - name: Setup CernVM-FS
       run: cat /etc/cvmfs/default.local && ls /cvmfs/eic.opensciencegrid.org/

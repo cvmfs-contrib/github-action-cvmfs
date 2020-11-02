@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: eic/setup-cvmfs@main
+    - uses: cvmfs-contrib/setup-cvmfs@main
       with:
         cvmfs_http_proxy: 'auto'
     - name: Setup CernVM-FS
