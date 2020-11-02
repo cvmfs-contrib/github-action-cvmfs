@@ -31,7 +31,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: cvmfs-contrib/setup-cvmfs@main
     - name: Setup CernVM-FS
-      run: cat /etc/cvmfs/default.local && ls /cvmfs/eic.opensciencegrid.org/
+      run: cat /etc/cvmfs/default.local && ls /cvmfs/grid.cern.ch && cvmfs_config showconfig grid.cern.ch
 ```
 
 ## What Does This Action Do?
