@@ -1,4 +1,4 @@
-name: 'setup-cvmfs'
+name: 'CernVM-FS (cvmfs)'
 description: 'Load the CernVM-FS filesystem at /cvmfs'
 branding:
   icon: 'database'
