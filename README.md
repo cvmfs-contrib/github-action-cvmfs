@@ -17,6 +17,7 @@ jobs:
 The following parameters are supported:
 - `cvmfs_repositories` (optional, defaults to `atlas.cern.ch,atlas-condb.cern.ch,grid.cern.ch`): the list of repositories to load.
 - `cvmfs_http_proxy` (optional, defaults to `DIRECT`): the http proxy to use with cvmfs.
+- `cvmfs_config_package` (optional, defaults to `cvmfs-config-default`): URL to cvmfs config package to install
 
 ## Minimal Example
 
