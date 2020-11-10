@@ -2,7 +2,7 @@
 This GitHub Action sets up CernVM-FS for use in GitHub Workflows.
 
 ## Instructions
-You can use this GitHub Action in a workflow in your own repository by with `uses: cvmfs-contrib/setup-cvmfs@main`.
+You can use this GitHub Action in a workflow in your own repository by with `uses: cvmfs-contrib/github-action-cvmfs@main`.
 
 For example, the file `.github/workflows/tests.yml` could include the following stanza:
 ```yaml
@@ -10,7 +10,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: cvmfs-contrib/setup-cvmfs@main
+    - uses: cvmfs-contrib/github-action-cvmfs@main
 ```
 
 ## Optional Parameters
@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: cvmfs-contrib/setup-cvmfs@main
+    - uses: cvmfs-contrib/github-action-cvmfs@main
     - name: Setup CernVM-FS
       run: cat /etc/cvmfs/default.local && ls /cvmfs/grid.cern.ch && cvmfs_config showconfig grid.cern.ch
 ```
