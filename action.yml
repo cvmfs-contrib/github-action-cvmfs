@@ -12,6 +12,10 @@ inputs:
     description: 'Proxy for cvmfs repositories'
     required: false
     default: 'DIRECT'
+  cvmfs_config_package:
+    description: 'URL of cvmfs config package to install'
+    required: false
+    default: 'cvmfs-config-default'
 runs:
   using: "composite"
   steps: 
