@@ -4,8 +4,15 @@
 wget -q https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest_all.deb
 sudo dpkg -i cvmfs-release-latest_all.deb
 sudo apt-get -q update
-sudo apt-get -q -y install cvmfs ${INPUT_CVMFS_CONFIG_PACKAGE:-cvmfs-config-default}
+sudo apt-get -q -y install cvmfs cvmfs-config-default
 rm -f cvmfs-release-latest_all.deb
+
+# Install custom config
+if [ ! -z "${INPUT_CVMFS_CONFIG_PACKAGE}" ] ; then
+  wget -O cvmfs-config.deb ${INPUT_CVMFS_CONFIG_PACKAGE}
+  sudo dpkg -i cvmfs-config.deb
+  rm -f cvmfs-config.deb
+fi
 
 # Setup default.local
 sudo mkdir -p /etc/cvmfs
