@@ -15,7 +15,7 @@ inputs:
   cvmfs_config_package:
     description: 'URL of cvmfs config package to install'
     required: false
-    default: 'cvmfs-config-default'
+    default: ''
 runs:
   using: "composite"
   steps: 
