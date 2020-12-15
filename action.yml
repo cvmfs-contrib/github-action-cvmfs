@@ -24,3 +24,4 @@ runs:
       env:
         INPUT_CVMFS_REPOSITORIES: ${{ inputs.cvmfs_repositories }}
         INPUT_CVMFS_HTTP_PROXY: ${{ inputs.cvmfs_http_proxy }}
+        INPUT_CVMFS_CONFIG_PACKAGE: ${{ inputs.cvmfs_config_package }}
