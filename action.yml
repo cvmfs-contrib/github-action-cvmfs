@@ -1,4 +1,4 @@
-name: 'CernVM-FS'
+name: 'CernVM File System (cvmfs)'
 description: 'Install the CernVM File System that provides a scalable, reliable and low-maintenance software distribution service.'
 branding:
   icon: 'folder'
