@@ -32,6 +32,8 @@ if [ "$1" == "local" ]; then
 else
   $THIS/createConfig.sh
 fi
+
+echo "Run cvmfs_config setup"
 sudo cvmfs_config setup
 
 
