@@ -27,7 +27,11 @@ else
   exit 1
 fi
 
-$THIS/createConfig.sh
+if [ "$1" == "local" ]; then
+  . createConfig.sh
+else
+  $THIS/createConfig.sh
+fi
 sudo cvmfs_config setup
 
 

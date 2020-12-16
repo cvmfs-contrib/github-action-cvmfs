@@ -324,10 +324,20 @@ inputs:
     description: 'URL to the cvmfs config package to install'
     required: false
     default: 'cvmfs-config-default'
+  run_local_checkout:
+    description: 'Run the local checkout of the action and not the main repo code'
+    required: false
+    default: 'false'
 runs:
   using: "composite"
   steps:
-    - run: ${{ github.action_path }}/setup-cvmfs.sh
+    - run: |
+        if [ "${{ inputs.run_local_checkout }}" == "true" ]; then
+          echo "WARNING running local checkout of the action !"
+          .  setup-cvmfs.sh local
+        else
+          ${{ github.action_path }}/setup-cvmfs.sh
+        fi
       shell: bash
       env:
         THIS: ${{ github.action_path }}

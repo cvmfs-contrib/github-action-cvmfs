@@ -10,7 +10,7 @@ jobs:
   ubuntu-minimal:
     runs-on: ubuntu-latest
     steps:
-    - uses: AIDASoft/setup-cvmfs@master
+    - uses: cvmfs-contrib/github-action-cvmfs@main
     - name: Test CernVM-FS
       run: ls /cvmfs/sft.cern.ch/
 ```
@@ -22,7 +22,7 @@ jobs:
   macOS-minimal:
     runs-on: macos-latest
     steps:
-    - uses: AIDASoft/setup-cvmfs@master
+    - uses: cvmfs-contrib/github-action-cvmfs@main
       with:
         cvmfs_repositories: 'sft.cern.ch'
     - name: Test CernVM-FS
@@ -112,6 +112,7 @@ The following parameters are supported:
 - `cvmfs_ubuntu_deb_location`: Location from where to download the Ubuntu deb package of CernVM-FS.
 - `cvmfs_macos_pkg_location`: Location from where to download the masOS pkg package of CernVM-FS.
 - `cvmfs_config_package`: URL to the cvmfs config package to install.
+- `run_local_checkout`: Run the local checkout of the action and not the main repo code. Only used for testing and development of this action (needed in CI).
 
 # Optional Parameters Defaults
 All optional parameters are set to default to `''`(empty string). All variables that are set to this value are not propagated to `default.local`. The only exception to this are the following variables set to particular defaults:
