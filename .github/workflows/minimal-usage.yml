@@ -1,10 +1,21 @@
-name: Test setup-cvmfs action (minimal usage)
+name: Minimal usage
 on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
     - uses: cvmfs-contrib/github-action-cvmfs@main
-    - name: Setup CernVM-FS
-      run: cat /etc/cvmfs/default.local && ls /cvmfs/grid.cern.ch/ && cvmfs_config showconfig grid.cern.ch
+    - name: Test CernVM-FS
+      run: |
+        echo "### Dump default.local ###"
+        cat /etc/cvmfs/default.local
+        echo "### Test /cvmfs/lhcb.cern.ch ###"
+        ls /cvmfs/lhcb.cern.ch
+        echo "### Test /cvmfs/auger.egi.eu ###"
+        ls /cvmfs/auger.egi.eu
+        echo "### Test /cvmfs/dune.opensciencegrid.org ###"
+        ls /cvmfs/dune.opensciencegrid.org
+        echo "### Test /cvmfs/sw.hsf.org ###"
+        ls /cvmfs/sw.hsf.org
+        echo "### Test /cvmfs/sft.cern.ch ###"
+        ls /cvmfs/sft.cern.ch

@@ -1,28 +1,40 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Install cvmfs
-wget -q https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest_all.deb
-sudo dpkg -i cvmfs-release-latest_all.deb
-sudo apt-get -q update
-sudo apt-get -q -y install cvmfs cvmfs-config-default
-rm -f cvmfs-release-latest_all.deb
-
-# Install custom config
-if [ ! -z "${INPUT_CVMFS_CONFIG_PACKAGE}" ] ; then
-  wget -O cvmfs-config.deb ${INPUT_CVMFS_CONFIG_PACKAGE}
-  sudo dpkg -i cvmfs-config.deb
-  rm -f cvmfs-config.deb
+#Platform specific install
+if [ "$(uname)" == "Linux" ]; then
+  curl -L -o cvmfs-release-latest_all.deb ${CVMFS_UBUNTU_DEB_LOCATION}
+  sudo dpkg -i cvmfs-release-latest_all.deb
+  sudo apt-get -q update
+  sudo apt-get -q -y install cvmfs
+  rm -f cvmfs-release-latest_all.deb
+  if [ "${CVMFS_CONFIG_PACKAGE}" == "cvmfs-config-default" ]; then
+    sudo apt-get -q -y install cvmfs-config-default
+  else
+    curl -L -o cvmfs-config.deb ${CVMFS_CONFIG_PACKAGE}
+    sudo dpkg -i cvmfs-config.deb
+    rm -f cvmfs-config.deb
+  fi
+elif [ "$(uname)" == "Darwin" ]; then
+  # Temporary fix for macOS until cvmfs 2.8 is released
+  if [ -z "${CVMFS_HTTP_PROXY}" ]; then
+    export CVMFS_HTTP_PROXY='DIRECT'
+  fi
+  brew cask install osxfuse
+  curl -L -o cvmfs-latest.pkg ${CVMFS_MACOS_PKG_LOCATION}
+  sudo installer -package cvmfs-latest.pkg -target /
+else
+  echo "Unsupported platform"
+  exit 1
 fi
 
-# Setup default.local
-sudo mkdir -p /etc/cvmfs
-echo "CVMFS_REPOSITORIES=${INPUT_CVMFS_REPOSITORIES:-atlas.cern.ch,atlas-condb.cern.ch,grid.cern.ch}" | sudo tee /etc/cvmfs/default.local
-echo "CVMFS_HTTP_PROXY=${INPUT_CVMFS_HTTP_PROXY:-DIRECT}" | sudo tee -a /etc/cvmfs/default.local
-echo "CVMFS_USE_CDN=yes" | sudo tee -a /etc/cvmfs/default.local
+$THIS/createConfig.sh
 sudo cvmfs_config setup
 
-# Configure autofs
-echo "+dir:/etc/auto.master.d" | sudo tee /etc/auto.master
-sudo mkdir -p /etc/auto.master.d
-echo "/cvmfs /etc/auto.cvmfs" | sudo tee /etc/auto.master.d/cvmfs.autofs
-sudo service autofs start
+
+if [ "$(uname)" == "Darwin" ]; then
+  for repo in $(echo ${CVMFS_REPOSITORIES} | sed "s/,/ /g")
+  do
+    mkdir -p /Users/Shared/cvmfs/${repo}
+    sudo mount -t cvmfs ${repo} /Users/Shared/cvmfs/${repo}
+  done
+fi

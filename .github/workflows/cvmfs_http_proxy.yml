@@ -1,12 +1,15 @@
-name: Test setup-cvmfs action (with cvmfs_http_proxy)
+name: with cvmfs_http_proxy
 on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
     - uses: cvmfs-contrib/github-action-cvmfs@main
       with:
         cvmfs_http_proxy: 'auto'
     - name: Setup CernVM-FS
-      run: cat /etc/cvmfs/default.local
+      run: |
+        echo "### Dump default.local ###"
+        cat /etc/cvmfs/default.local
+        echo "### Chech cvmfs_http_proxy is set corretly to auto ###"
+        grep auto /etc/cvmfs/default.local
