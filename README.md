@@ -5,7 +5,7 @@
 This GitHub Action sets up CernVM-FS for use in GitHub Workflows.
 
 ## Instructions
-You can use this GitHub Action in a workflow in your own repository with `uses: cvmfs-contrib/github-action-cvmfs@main`.
+You can use this GitHub Action in a workflow in your own repository with `uses: cvmfs-contrib/github-action-cvmfs@v2`.
 
 A minimal job example for GitHub-hosted runners of type `ubuntu-latest`:
 ```yaml
@@ -13,7 +13,7 @@ jobs:
   ubuntu-minimal:
     runs-on: ubuntu-latest
     steps:
-    - uses: cvmfs-contrib/github-action-cvmfs@main
+    - uses: cvmfs-contrib/github-action-cvmfs@v2
     - name: Test CernVM-FS
       run: ls /cvmfs/sft.cern.ch/
 ```
@@ -25,7 +25,7 @@ jobs:
   macOS-minimal:
     runs-on: macos-latest
     steps:
-    - uses: cvmfs-contrib/github-action-cvmfs@main
+    - uses: cvmfs-contrib/github-action-cvmfs@v2
       with:
         cvmfs_repositories: 'sft.cern.ch'
     - name: Test CernVM-FS
@@ -136,7 +136,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: cvmfs-contrib/github-action-cvmfs@main
+    - uses: cvmfs-contrib/github-action-cvmfs@v2
     - name: Test CernVM-FS
       run: |
         ls /cvmfs/lhcb.cern.ch
