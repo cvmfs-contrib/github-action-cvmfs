@@ -1,4 +1,4 @@
-name: Minimal usage
+name: ubuntu
 on: [push, pull_request]
 jobs:
   build:

@@ -1,4 +1,4 @@
-name: macOS with cvmfs_repositories
+name: macOS
 on: [push, pull_request]
 jobs:
   macOS-minimal:
