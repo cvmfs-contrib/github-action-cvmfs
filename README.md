@@ -1,5 +1,6 @@
 # GitHub Action: cvmfs-contrib/github-action-cvmfs
-![ubuntu](https://github.com/cvmfs-contrib/github-action-cvmfs/workflows/ubuntu/badge.svg)![macOS](https://github.com/cvmfs-contrib/github-action-cvmfs/workflows/macOS/badge.svg)
+[![ubuntu](https://github.com/cvmfs-contrib/github-action-cvmfs/workflows/ubuntu/badge.svg)](https://github.com/cvmfs-contrib/github-action-cvmfs/actions?query=workflow%3Aubuntu) [![macOS](https://github.com/cvmfs-contrib/github-action-cvmfs/workflows/macOS/badge.svg)](https://github.com/cvmfs-contrib/github-action-cvmfs/actions?query=workflow%3AmacOS)
+
 
 This GitHub Action sets up CernVM-FS for use in GitHub Workflows.
 
