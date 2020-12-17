@@ -1,4 +1,4 @@
-name: Test setup-cvmfs action (with cvmfs_config_package)
+name: with cvmfs_config_package
 on: [push, pull_request]
 jobs:
   build:
@@ -8,6 +8,16 @@ jobs:
     - uses: cvmfs-contrib/github-action-cvmfs@main
       with:
         cvmfs_repositories: 'pilot.eessi-hpc.org'
+        cvmfs_http_proxy: 'DIRECT'
         cvmfs_config_package: 'https://github.com/EESSI/filesystem-layer/releases/download/v0.2.3/cvmfs-config-eessi_0.2.3_all.deb'
-    - name: Setup CernVM-FS
-      run: cat /etc/cvmfs/default.local && ls /cvmfs/pilot.eessi-hpc.org && cvmfs_config showconfig pilot.eessi-hpc.org
+        run_local_checkout: 'true'
+    - name: Test CernVM-FS
+      run: |
+        echo "### Dump default.local ###"
+        cat /etc/cvmfs/default.local
+        echo "### Try cvmfs_config probe ###"
+        sudo cvmfs_config probe
+        echo "### Test /cvmfs/pilot.eessi-hpc.org ###"
+        ls /cvmfs/pilot.eessi-hpc.org
+        echo "### Test cvmfs_config showconfig pilot.eessi-hpc.org ###"
+        cvmfs_config showconfig pilot.eessi-hpc.org

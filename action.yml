@@ -1,27 +1,423 @@
-name: 'CernVM-FS (cvmfs)'
-description: 'Load the CernVM-FS filesystem at /cvmfs'
+name: 'CernVM File System (cvmfs)'
+description: 'Install the CernVM File System that provides a scalable, reliable and low-maintenance software distribution service.'
 branding:
-  icon: 'database'
-  color: 'blue'
+  icon: 'folder'
+  color: 'orange'
 inputs:
-  cvmfs_repositories:
-    description: 'List of cvmfs repositories to load'
-    required: false
-    default: 'atlas.cern.ch,atlas-condb.cern.ch,grid.cern.ch'
-  cvmfs_http_proxy:
-    description: 'Proxy for cvmfs repositories'
-    required: false
-    default: 'DIRECT'
-  cvmfs_config_package:
-    description: 'URL of cvmfs config package to install'
+  cvmfs_alien_cache:
+    description: 'If set, use an alien cache at the given location.'
     required: false
     default: ''
+  cvmfs_alt_root_path:
+    description: 'If set to yes, use alternative root catalog path. Only required for fixed catalogs (tag / hash) under the alternative path.'
+    required: false
+    default: ''
+  cvmfs_authz_helper:
+    description: 'Full path to an authz helper, overwrites the helper hint in the catalog.'
+    required: false
+    default: ''
+  cvmfs_authz_search_path:
+    description: 'Full path to the directory that contains the authz helpers.'
+    required: false
+    default: ''
+  cvmfs_auto_update:
+    description: 'If set to no, disables the automatic update of file catalogs.'
+    required: false
+    default: ''
+  cvmfs_backoff_init:
+    description: 'Seconds for the maximum initial backoff when retrying to download data.'
+    required: false
+    default: ''
+  cvmfs_backoff_max:
+    description: 'Maximum backoff in seconds when retrying to download data.'
+    required: false
+    default: ''
+  cvmfs_cache_base:
+    description: 'Location (directory) of the CernVM-FS cache.'
+    required: false
+    default: ''
+  cvmfs_catalog_watermark:
+    description: 'Try to release pinned catalogs when their number surpasses the given watermark. Defaults to 1/4 CVMFS_NFILES; explicitly set by shrinkwrap.'
+    required: false
+    default: ''
+  cvmfs_check_permissions:
+    description: 'If set to no, disable checking of file ownership and permissions (open all files).'
+    required: false
+    default: ''
+  cvmfs_claim_ownership:
+    description: 'If set to yes, allows CernVM-FS to claim ownership of files and directories.'
+    required: false
+    default: ''
+  cvmfs_client_profile:
+    description: 'Choose a suitable proxy automatically is set to single'
+    required: false
+    default: 'single'
+  cvmfs_config_repo_required:
+    description: 'If set to yes, no repository can be mounted unless the config repository is available.'
+    required: false
+    default: ''
+  cvmfs_debuglog:
+    description: 'If set, run CernVM-FS in debug mode and write a verbose log the the specified file.'
+    required: false
+    default: ''
+  cvmfs_default_domain:
+    description: 'The default domain will be automatically appended to repository names when given without a domain.'
+    required: false
+    default: ''
+  cvmfs_dns_max_ttl:
+    description: 'Maximum effective TTL in seconds for DNS queries of proxy server names(not Stratum 1s). Defaults to 1 day.'
+    required: false
+    default: ''
+  cvmfs_dns_min_ttl:
+    description: 'Minimum effective TTL in seconds for DNS queries of proxy server names (not Stratum 1s). Defaults to 1 minute.'
+    required: false
+    default: ''
+  cvmfs_dns_retries:
+    description: 'Number of retries when resolving proxy names.'
+    required: false
+    default: ''
+  cvmfs_dns_roaming:
+    description: 'If true, watch /etc/resolv.conf for nameserver changes.'
+    required: false
+    default: ''
+  cvmfs_dns_timeout:
+    description: 'Timeout in seconds when resolving proxy names.'
+    required: false
+    default: ''
+  cvmfs_enforce_acls:
+    description: 'Enforce POSIX ACLs stored in the repository. Requires libfuse 3.'
+    required: false
+    default: ''
+  cvmfs_external_fallback_proxy:
+    description: 'List of HTTP proxies similar to CVMFS_EXTERNAL_HTTP_PROXY. The fallback proxies are added to the end of the normal proxies, and disable DIRECT connections.'
+    required: false
+    default: ''
+  cvmfs_external_http_proxy:
+    description: 'Chain of HTTP proxy groups to be used when CernVM-FS is accessing external data.'
+    required: false
+    default: ''
+  cvmfs_external_timeout:
+    description: 'Timeout in seconds for HTTP requests to an external-data server with a proxy server.'
+    required: false
+    default: ''
+  cvmfs_external_timeout_direct:
+    description: 'Timeout in seconds for HTTP requests to an external-data server without a proxy server.'
+    required: false
+    default: ''
+  cvmfs_external_url:
+    description: 'Semicolon-separated chain of webservers serving external data chunks.'
+    required: false
+    default: ''
+  cvmfs_fallback_proxy:
+    description: 'List of HTTP proxies similar to CVMFS_HTTP_PROXY. The fallback proxies are added to the end of the normal proxies, and disable DIRECT connections.'
+    required: false
+    default: ''
+  cvmfs_follow_redirects:
+    description: 'When set to yes, follow up to 4 HTTP redirects in requests.'
+    required: false
+    default: ''
+  cvmfs_hide_magic_xattrs:
+    description: 'If set to yes the client will not expose CernVM-FS specific extended attributes.'
+    required: false
+    default: ''
+  cvmfs_host_reset_after:
+    description: 'See CVMFS_PROXY_RESET_AFTER.'
+    required: false
+    default: ''
+  cvmfs_http_proxy:
+    description: 'Chain of HTTP proxy groups used by CernVM-FS. Necessary.Set to DIRECT if you don’t use proxies.'
+    required: false
+    default: ''
+  cvmfs_ignore_signature:
+    description: 'When set to yes, don’t verify CernVM-FS file catalog signatures.'
+    required: false
+    default: ''
+  cvmfs_initial_generation:
+    description: 'Initial inode generation. Used for testing.'
+    required: false
+    default: ''
+  cvmfs_instrument_fuse:
+    description: 'When set to true gather performance statistics about the FUSE callbacks. The results are displayed with cvmfs_talk internal affairs.'
+    required: false
+    default: ''
+  cvmfs_ipfamily_prefer:
+    description: 'Which IP protocol to prefer when connecting to proxies. Can be either 4 or 6.'
+    required: false
+    default: ''
+  cvmfs_kcache_timeout:
+    description: 'Timeout for path names and file attributes in the kernel file system buffers.'
+    required: false
+    default: ''
+  cvmfs_keys_dir:
+    description: 'Directory containing *.pub files used as repository signing keys. If set, this parameter has precedence over CVMFS_PUBLIC_KEY.'
+    required: false
+    default: ''
+  cvmfs_low_speed_limit:
+    description: 'Minimum transfer rate a server or proxy must provide.'
+    required: false
+    default: ''
+  cvmfs_max_external_servers:
+    description: 'Limit the number of (geo sorted) stratum 1 servers for external data that are effectively used.'
+    required: false
+    default: ''
+  cvmfs_max_ipaddr_per_proxy:
+    description: 'Limit the number of IP addresses a proxy names resolves into. From all registered addresses, up to the limit are randomly selected.'
+    required: false
+    default: ''
+  cvmfs_max_retries:
+    description: 'Maximum number of retries for a given proxy/host combination.'
+    required: false
+    default: ''
+  cvmfs_max_servers:
+    description: 'Limit the number of (geo sorted) stratum 1 servers that are effectively used.'
+    required: false
+    default: ''
+  cvmfs_max_ttl:
+    description: 'Maximum file catalog TTL in minutes. Can overwrite the TTL stored in the catalog.'
+    required: false
+    default: ''
+  cvmfs_memcache_size:
+    description: 'Size of the CernVM-FS meta-data memory cache in Megabyte.'
+    required: false
+    default: ''
+  cvmfs_mount_rw:
+    description: 'Mount CernVM-FS as a read/write file system. Write operations will fail but this option can workaround faulty open() flags.'
+    required: false
+    default: ''
+  cvmfs_nfiles:
+    description: 'Maximum number of open file descriptors that can be used by the CernVM-FS process.'
+    required: false
+    default: ''
+  cvmfs_nfs_interleaved_inodes:
+    description: 'In NFS mode, use only inodes of the form an+b, specified as “b%a”.'
+    required: false
+    default: ''
+  cvmfs_nfs_shared:
+    description: 'If set a path, used to store the NFS maps in an SQlite database, instead of the usual LevelDB storage in the cache directory.'
+    required: false
+    default: ''
+  cvmfs_nfs_source:
+    description: 'If set to yes, act as a source for the NFS daemon (NFS export).'
+    required: false
+    default: ''
+  cvmfs_oom_score_adj:
+    description: 'Set the Linux kernel’s out-of-memory killer priority for the CernVM-FS client [-1000 - 1000].'
+    required: false
+    default: ''
+  cvmfs_pac_urls:
+    description: 'Chain of URLs pointing to PAC files with HTTP proxy configuration information.'
+    required: false
+    default: ''
+  cvmfs_proxy_reset_after:
+    description: 'Delay in seconds after which CernVM-FS will retry the primary proxy group in case of a fail-over to another group.'
+    required: false
+    default: ''
+  cvmfs_proxy_template:
+    description: 'Overwrite the default proxy template in Geo-API calls. Only needed for debugging.'
+    required: false
+    default: ''
+  cvmfs_public_key:
+    description: 'Colon-separated list of repository signing keys.'
+    required: false
+    default: ''
+  cvmfs_quota_limit:
+    description: 'Soft-limit of the cache in Megabyte. Consult https://docs.github.com/en/free-pro-team@latest/actions/reference/specifications-for-github-hosted-runners#supported-runners-and-hardware-resources before changing'
+    required: false
+    default: '15000'
+  cvmfs_reload_sockets:
+    description: 'Directory of the sockets used by the CernVM-FS loader to trigger hotpatching/reloading.'
+    required: false
+    default: ''
+  cvmfs_repositories:
+    description: 'Comma-separated list of fully qualified repository names that shall be mountable under /cvmfs.'
+    required: false
+    default: ''
+  cvmfs_repository_date:
+    description: 'A timestamp in ISO format (e.g. 2007-03-01T13:00:00Z). Selects the repository state as of the given date.'
+    required: false
+    default: ''
+  cvmfs_repository_tag:
+    description: 'Select a named repository snapshot that should be mounted instead of trunk.'
+    required: false
+    default: ''
+  cvmfs_root_hash:
+    description: 'Hash of the root file catalog, implies CVMFS_AUTO_UPDATE=no.'
+    required: false
+    default: ''
+  cvmfs_send_info_header:
+    description: 'If set to yes, include the cvmfs path of downloaded data in HTTP headers.'
+    required: false
+    default: ''
+  cvmfs_server_cache_mode:
+    description: 'Enable special cache semantics for a client used as a publisher’s repository base line.'
+    required: false
+    default: ''
+  cvmfs_server_url:
+    description: 'Semicolon-separated chain of Stratum~1 servers.'
+    required: false
+    default: ''
+  cvmfs_shared_cache:
+    description: 'If set to no, makes a repository use an exclusive cache.'
+    required: false
+    default: ''
+  cvmfs_strict_mount:
+    description: 'If set to yes, mount only repositories that are listed in CVMFS_REPOSITORIES.'
+    required: false
+    default: ''
+  cvmfs_suid:
+    description: 'If set to yes, enable suid magic on the mounted repository. Requires mounting as root.'
+    required: false
+    default: ''
+  cvmfs_syslog_facility:
+    description: 'If set to a number between 0 and 7, uses the corresponding LOCAL$n$ facility for syslog messages.'
+    required: false
+    default: ''
+  cvmfs_syslog_level:
+    description: 'If set to 1 or 2, sets the syslog level for CernVM-FS messages to LOG_DEBUG or LOG_INFO respectively.'
+    required: false
+    default: ''
+  cvmfs_systemd_nokill:
+    description: 'If set to yes, modify the command line to @vmfs2 ... in order to act as a systemd lowlevel storage manager.'
+    required: false
+    default: ''
+  cvmfs_timeout:
+    description: 'Timeout in seconds for HTTP requests with a proxy server.'
+    required: false
+    default: ''
+  cvmfs_timeout_direct:
+    description: 'Timeout in seconds for HTTP requests without a proxy server.'
+    required: false
+    default: ''
+  cvmfs_tracefile:
+    description: 'If set, enables the tracer and trace file system calls to the given file.'
+    required: false
+    default: ''
+  cvmfs_use_cdn:
+    description: 'Change the stratum 1 endpoints to caching servers from Cloudflare.'
+    required: false
+    default: 'yes'
+  cvmfs_use_geoapi:
+    description: 'Request order of Stratum 1 servers and fallback proxies via Geo-API.'
+    required: false
+    default: ''
+  cvmfs_user:
+    description: 'Sets the gid and uid mount options. Don’t touch or overwrite.'
+    required: false
+    default: ''
+  cvmfs_usyslog:
+    description: 'All messages that normally are logged to syslog are re-directed to the given file. This file can grow up to 500kB and there is one step of log rotation. Required for $mu$CernVM.'
+    required: false
+    default: ''
+  cvmfs_workspace:
+    description: 'Set the local directory for storing special files (defaults to the cache directory).'
+    required: false
+    default: ''
+  cvmfs_ubuntu_deb_location:
+    description: 'Location from where to download the Ubuntu deb package of CernVM-FS'
+    required: false
+    default: 'https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest_all.deb'
+  cvmfs_macos_pkg_location:
+    description: 'Location from where to download the masOS pkg package of CernVM-FS'
+    required: false
+    default: 'http://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-latest.pkg'
+  cvmfs_config_package:
+    description: 'URL to the cvmfs config package to install'
+    required: false
+    default: 'cvmfs-config-default'
+  run_local_checkout:
+    description: 'Run the local checkout of the action and not the main repo code'
+    required: false
+    default: 'false'
 runs:
   using: "composite"
-  steps: 
-    - run: ${{ github.action_path }}/setup-cvmfs.sh
+  steps:
+    - run: |
+        if [ "${{ inputs.run_local_checkout }}" == "true" ]; then
+          echo "WARNING running local checkout of the action !"
+          .  setup-cvmfs.sh local
+        else
+          ${{ github.action_path }}/setup-cvmfs.sh
+        fi
       shell: bash
       env:
-        INPUT_CVMFS_REPOSITORIES: ${{ inputs.cvmfs_repositories }}
-        INPUT_CVMFS_HTTP_PROXY: ${{ inputs.cvmfs_http_proxy }}
-        INPUT_CVMFS_CONFIG_PACKAGE: ${{ inputs.cvmfs_config_package }}
+        THIS: ${{ github.action_path }}
+        CVMFS_ALIEN_CACHE: ${{ inputs.cvmfs_alien_cache }}
+        CVMFS_ALT_ROOT_PATH: ${{ inputs.cvmfs_alt_root_path }}
+        CVMFS_AUTHZ_HELPER: ${{ inputs.cvmfs_authz_helper }}
+        CVMFS_AUTHZ_SEARCH_PATH: ${{ inputs.cvmfs_authz_search_path }}
+        CVMFS_AUTO_UPDATE: ${{ inputs.cvmfs_auto_update }}
+        CVMFS_BACKOFF_INIT: ${{ inputs.cvmfs_backoff_init }}
+        CVMFS_BACKOFF_MAX: ${{ inputs.cvmfs_backoff_max }}
+        CVMFS_CACHE_BASE: ${{ inputs.cvmfs_cache_base }}
+        CVMFS_CATALOG_WATERMARK: ${{ inputs.cvmfs_catalog_watermark }}
+        CVMFS_CHECK_PERMISSIONS: ${{ inputs.cvmfs_check_permissions }}
+        CVMFS_CLAIM_OWNERSHIP: ${{ inputs.cvmfs_claim_ownership }}
+        CVMFS_CLIENT_PROFILE: ${{ inputs.cvmfs_client_profile }}
+        CVMFS_CONFIG_REPO_REQUIRED: ${{ inputs.cvmfs_config_repo_required }}
+        CVMFS_DEBUGLOG: ${{ inputs.cvmfs_debuglog }}
+        CVMFS_DEFAULT_DOMAIN: ${{ inputs.cvmfs_default_domain }}
+        CVMFS_DNS_MAX_TTL: ${{ inputs.cvmfs_dns_max_ttl }}
+        CVMFS_DNS_MIN_TTL: ${{ inputs.cvmfs_dns_min_ttl }}
+        CVMFS_DNS_RETRIES: ${{ inputs.cvmfs_dns_retries }}
+        CVMFS_DNS_ROAMING: ${{ inputs.cvmfs_dns_roaming }}
+        CVMFS_DNS_TIMEOUT: ${{ inputs.cvmfs_dns_timeout }}
+        CVMFS_ENFORCE_ACLS: ${{ inputs.cvmfs_enforce_acls }}
+        CVMFS_EXTERNAL_FALLBACK_PROXY: ${{ inputs.cvmfs_external_fallback_proxy }}
+        CVMFS_EXTERNAL_HTTP_PROXY: ${{ inputs.cvmfs_external_http_proxy }}
+        CVMFS_EXTERNAL_TIMEOUT: ${{ inputs.cvmfs_external_timeout }}
+        CVMFS_EXTERNAL_TIMEOUT_DIRECT: ${{ inputs.cvmfs_external_timeout_direct }}
+        CVMFS_EXTERNAL_URL: ${{ inputs.cvmfs_external_url }}
+        CVMFS_FALLBACK_PROXY: ${{ inputs.cvmfs_fallback_proxy }}
+        CVMFS_FOLLOW_REDIRECTS: ${{ inputs.cvmfs_follow_redirects }}
+        CVMFS_HIDE_MAGIC_XATTRS: ${{ inputs.cvmfs_hide_magic_xattrs }}
+        CVMFS_HOST_RESET_AFTER: ${{ inputs.cvmfs_host_reset_after }}
+        CVMFS_HTTP_PROXY: ${{ inputs.cvmfs_http_proxy }}
+        CVMFS_IGNORE_SIGNATURE: ${{ inputs.cvmfs_ignore_signature }}
+        CVMFS_INITIAL_GENERATION: ${{ inputs.cvmfs_initial_generation }}
+        CVMFS_INSTRUMENT_FUSE: ${{ inputs.cvmfs_instrument_fuse }}
+        CVMFS_IPFAMILY_PREFER: ${{ inputs.cvmfs_ipfamily_prefer }}
+        CVMFS_KCACHE_TIMEOUT: ${{ inputs.cvmfs_kcache_timeout }}
+        CVMFS_KEYS_DIR: ${{ inputs.cvmfs_keys_dir }}
+        CVMFS_LOW_SPEED_LIMIT: ${{ inputs.cvmfs_low_speed_limit }}
+        CVMFS_MAX_EXTERNAL_SERVERS: ${{ inputs.cvmfs_max_external_servers }}
+        CVMFS_MAX_IPADDR_PER_PROXY: ${{ inputs.cvmfs_max_ipaddr_per_proxy }}
+        CVMFS_MAX_RETRIES: ${{ inputs.cvmfs_max_retries }}
+        CVMFS_MAX_SERVERS: ${{ inputs.cvmfs_max_servers }}
+        CVMFS_MAX_TTL: ${{ inputs.cvmfs_max_ttl }}
+        CVMFS_MEMCACHE_SIZE: ${{ inputs.cvmfs_memcache_size }}
+        CVMFS_MOUNT_RW: ${{ inputs.cvmfs_mount_rw }}
+        CVMFS_NFILES: ${{ inputs.cvmfs_nfiles }}
+        CVMFS_NFS_INTERLEAVED_INODES: ${{ inputs.cvmfs_nfs_interleaved_inodes }}
+        CVMFS_NFS_SHARED: ${{ inputs.cvmfs_nfs_shared }}
+        CVMFS_NFS_SOURCE: ${{ inputs.cvmfs_nfs_source }}
+        CVMFS_OOM_SCORE_ADJ: ${{ inputs.cvmfs_oom_score_adj }}
+        CVMFS_PAC_URLS: ${{ inputs.cvmfs_pac_urls }}
+        CVMFS_PROXY_RESET_AFTER: ${{ inputs.cvmfs_proxy_reset_after }}
+        CVMFS_PROXY_TEMPLATE: ${{ inputs.cvmfs_proxy_template }}
+        CVMFS_PUBLIC_KEY: ${{ inputs.cvmfs_public_key }}
+        CVMFS_QUOTA_LIMIT: ${{ inputs.cvmfs_quota_limit }}
+        CVMFS_RELOAD_SOCKETS: ${{ inputs.cvmfs_reload_sockets }}
+        CVMFS_REPOSITORIES: ${{ inputs.cvmfs_repositories }}
+        CVMFS_REPOSITORY_DATE: ${{ inputs.cvmfs_repository_date }}
+        CVMFS_REPOSITORY_TAG: ${{ inputs.cvmfs_repository_tag }}
+        CVMFS_ROOT_HASH: ${{ inputs.cvmfs_root_hash }}
+        CVMFS_SEND_INFO_HEADER: ${{ inputs.cvmfs_send_info_header }}
+        CVMFS_SERVER_CACHE_MODE: ${{ inputs.cvmfs_server_cache_mode }}
+        CVMFS_SERVER_URL: ${{ inputs.cvmfs_server_url }}
+        CVMFS_SHARED_CACHE: ${{ inputs.cvmfs_shared_cache }}
+        CVMFS_STRICT_MOUNT: ${{ inputs.cvmfs_strict_mount }}
+        CVMFS_SUID: ${{ inputs.cvmfs_suid }}
+        CVMFS_SYSLOG_FACILITY: ${{ inputs.cvmfs_syslog_facility }}
+        CVMFS_SYSLOG_LEVEL: ${{ inputs.cvmfs_syslog_level }}
+        CVMFS_SYSTEMD_NOKILL: ${{ inputs.cvmfs_systemd_nokill }}
+        CVMFS_TIMEOUT: ${{ inputs.cvmfs_timeout }}
+        CVMFS_TIMEOUT_DIRECT: ${{ inputs.cvmfs_timeout_direct }}
+        CVMFS_TRACEFILE: ${{ inputs.cvmfs_tracefile }}
+        CVMFS_USE_CDN: ${{ inputs.cvmfs_use_cdn }}
+        CVMFS_USE_GEOAPI: ${{ inputs.cvmfs_use_geoapi }}
+        CVMFS_USER: ${{ inputs.cvmfs_user }}
+        CVMFS_USYSLOG: ${{ inputs.cvmfs_usyslog }}
+        CVMFS_WORKSPACE: ${{ inputs.cvmfs_workspace }}
+        CVMFS_UBUNTU_DEB_LOCATION: ${{ inputs.cvmfs_ubuntu_deb_location }}
+        CVMFS_MACOS_PKG_LOCATION: ${{ inputs.cvmfs_macos_pkg_location }}
+        CVMFS_CONFIG_PACKAGE: ${{ inputs.cvmfs_config_package }}

@@ -1,4 +1,4 @@
-name: Test setup-cvmfs action (with cvmfs_repositories)
+name: with cvmfs_repositories
 on: [push, pull_request]
 jobs:
   build:
@@ -8,5 +8,14 @@ jobs:
     - uses: cvmfs-contrib/github-action-cvmfs@main
       with:
         cvmfs_repositories: 'grid.cern.ch'
-    - name: Setup CernVM-FS
-      run: cat /etc/cvmfs/default.local && ls /cvmfs/grid.cern.ch/ && cvmfs_config showconfig grid.cern.ch
+        run_local_checkout: 'true'
+    - name: Test CernVM-FS
+      run: |
+        echo "### Dump default.local ###"
+        cat /etc/cvmfs/default.local
+        echo "### Check if grid.cern.ch is in default.local ###"
+        grep grid.cern.ch /etc/cvmfs/default.local
+        echo "### Try to ls on /cvmfs/grid.cern.ch/ ###"
+        ls /cvmfs/grid.cern.ch/
+        echo "### Try cvmfs_config probe ###"
+        sudo cvmfs_config probe

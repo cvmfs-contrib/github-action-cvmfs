@@ -1,0 +1,17 @@
+name: macOS with cvmfs_repositories
+on: [push, pull_request]
+jobs:
+  macOS-minimal:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: cvmfs-contrib/github-action-cvmfs@main
+      with:
+        cvmfs_repositories: 'sft.cern.ch'
+        run_local_checkout: 'true'
+    - name: Test CernVM-FS
+      run: |
+       echo "### Dump default.local ###"
+       cat /etc/cvmfs/default.local
+       echo "### Try to ls on /Users/Shared/cvmfs/sft.cern.ch/ ###"
+       ls /Users/Shared/cvmfs/sft.cern.ch/
