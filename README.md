@@ -1,4 +1,6 @@
 # GitHub Action: cvmfs-contrib/github-action-cvmfs
+![ubuntu](https://github.com/cvmfs-contrib/github-action-cvmfs/workflows/ubuntu/badge.svg)![macOS](https://github.com/cvmfs-contrib/github-action-cvmfs/workflows/macOS/badge.svg)
+
 This GitHub Action sets up CernVM-FS for use in GitHub Workflows.
 
 ## Instructions
@@ -133,7 +135,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: petricm/github-action-cvmfs@add
+    - uses: cvmfs-contrib/github-action-cvmfs@main
     - name: Test CernVM-FS
       run: |
         ls /cvmfs/lhcb.cern.ch
