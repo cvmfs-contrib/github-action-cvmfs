@@ -19,7 +19,7 @@ elif [ "$(uname)" == "Darwin" ]; then
   if [ -z "${CVMFS_HTTP_PROXY}" ]; then
     export CVMFS_HTTP_PROXY='DIRECT'
   fi
-  brew cask install osxfuse
+  brew install --cask osxfuse
   curl -L -o cvmfs-latest.pkg ${CVMFS_MACOS_PKG_LOCATION}
   sudo installer -package cvmfs-latest.pkg -target /
 else
