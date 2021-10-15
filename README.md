@@ -19,11 +19,11 @@ jobs:
 ```
 By default 	`*.cern.ch, *.egi.eu, *.opensciencegrid.org *.hsf.org` repositories are available.
 
-The Action also works with runners of type `macos-latest`, however in this case it is necessary to specify which repositories you want to mount (via the variable `cvmfs_repositories`), as there is not auto mount for macOS. A minimal example of usage on `macos-latest` is:
+The Action also works with runners of type `macos-10.15`, however in this case it is necessary to specify which repositories you want to mount (via the variable `cvmfs_repositories`), as there is not auto mount for macOS. A minimal example of usage on `macos-10.15` is:
 ```yaml
 jobs:
   macOS-minimal:
-    runs-on: macos-latest
+    runs-on: macos-10.15
     steps:
     - uses: cvmfs-contrib/github-action-cvmfs@v2
       with:
