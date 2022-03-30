@@ -1,5 +1,9 @@
 name: ubuntu
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron:  '44 4 * * *'
 jobs:
   build:
     runs-on: ${{ matrix.os }}
