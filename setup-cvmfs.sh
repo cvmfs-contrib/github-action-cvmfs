@@ -2,10 +2,16 @@
 
 #Platform specific install
 if [ "$(uname)" == "Linux" ]; then
+  echo "::group::curl and dpkg latest cvmfs release"
   curl -L -o cvmfs-release-latest_all.deb ${CVMFS_UBUNTU_DEB_LOCATION}
   sudo dpkg -i cvmfs-release-latest_all.deb
+  echo "::endgroup::"
+  echo "::group::apt-get update"
   sudo apt-get -q update
+  echo "::endgroup::"
+  echo "::group::apt-get install"
   sudo apt-get -q -y install cvmfs
+  echo "::endgroup::"
   rm -f cvmfs-release-latest_all.deb
   if [ "${CVMFS_CONFIG_PACKAGE}" == "cvmfs-config-default" ]; then
     sudo apt-get -q -y install cvmfs-config-default
