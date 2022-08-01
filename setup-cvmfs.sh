@@ -15,6 +15,10 @@ if [ "$(uname)" == "Linux" ]; then
     rm -f cvmfs-config.deb
   fi
 elif [ "$(uname)" == "Darwin" ]; then
+  # Warn about the phasing out of MacOS support for this action
+  echo "::warning::The CernVM-FS GitHub Action's support for MacOS will be
+    phased out with macos-10.15, which will be unsupported by GitHub by 8/30/22.
+    See https://github.com/cvmfs-contrib/github-action-cvmfs/pull/17 for details."
   # Temporary fix for macOS until cvmfs 2.8 is released
   if [ -z "${CVMFS_HTTP_PROXY}" ]; then
     export CVMFS_HTTP_PROXY='DIRECT'
