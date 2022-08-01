@@ -1,6 +1,5 @@
 # GitHub Action: cvmfs-contrib/github-action-cvmfs
-[![ubuntu](https://github.com/cvmfs-contrib/github-action-cvmfs/workflows/ubuntu/badge.svg)](https://github.com/cvmfs-contrib/github-action-cvmfs/actions?query=workflow%3Aubuntu) [![macOS](https://github.com/cvmfs-contrib/github-action-cvmfs/workflows/macOS/badge.svg)](https://github.com/cvmfs-contrib/github-action-cvmfs/actions?query=workflow%3AmacOS)
-
+[![ubuntu](https://github.com/cvmfs-contrib/github-action-cvmfs/workflows/ubuntu/badge.svg)](https://github.com/cvmfs-contrib/github-action-cvmfs/actions?query=workflow%3Aubuntu)
 
 This GitHub Action sets up CernVM-FS for use in GitHub Workflows.
 
@@ -18,20 +17,6 @@ jobs:
       run: ls /cvmfs/sft.cern.ch/
 ```
 By default 	`*.cern.ch, *.egi.eu, *.opensciencegrid.org *.hsf.org` repositories are available.
-
-The Action also works with runners of type `macos-10.15`, however in this case it is necessary to specify which repositories you want to mount (via the variable `cvmfs_repositories`), as there is not auto mount for macOS. A minimal example of usage on `macos-10.15` is:
-```yaml
-jobs:
-  macOS-minimal:
-    runs-on: macos-10.15
-    steps:
-    - uses: cvmfs-contrib/github-action-cvmfs@v2
-      with:
-        cvmfs_repositories: 'sft.cern.ch'
-    - name: Test CernVM-FS
-      run: ls /Users/Shared/cvmfs/sft.cern.ch/
-```
-Beware that because the runner cannot be rebooted in the macOS case, the repositories are mounted under `/Users/Shared/cvmfs/`
 
 ## Optional Parameters
 The following parameters are supported:
@@ -113,7 +98,6 @@ The following parameters are supported:
 - `cvmfs_usyslog`: All messages that are normally logged to syslog are re-directed to the given file. This file can grow up to 500kB and there is one step of log rotation. Required for $mu$CernVM.
 - `cvmfs_workspace`: Set the local directory for storing special files (defaults to the cache directory).
 - `cvmfs_ubuntu_deb_location`: Location from where to download the Ubuntu deb package of CernVM-FS.
-- `cvmfs_macos_pkg_location`: Location from where to download the masOS pkg package of CernVM-FS.
 - `cvmfs_config_package`: URL to the cvmfs config package to install.
 - `run_local_checkout`: Run the local checkout of the action and not the main repo code. Only used for testing and development of this action (needed in CI).
 
@@ -123,7 +107,6 @@ All optional parameters are set by default to `''`(empty string). All variables 
  - `cvmfs_client_profile`: `'single'`
  - `cvmfs_use_cdn`: `'yes'`
  - `cvmfs_ubuntu_deb_location`: `https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest_all.deb`
- - `cvmfs_macos_pkg_location`: `http://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-latest.pkg`
  - `cvmfs_config_package`: `cvmfs-config-default`
 
 ## Minimal Example
@@ -152,7 +135,7 @@ This GitHub Action installs the [CernVM-FS package](https://cernvm.cern.ch/fs/#d
 
 ## Limitations
 
-This GitHub Action is only expected to work in workflows that [run on](https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on) ubuntu and macOS targets (and even then likely only `ubuntu-latest`). This exludes the `windows` targets.
+This GitHub Action is only expected to work in workflows that [run on](https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on) ubuntu. This exludes the `macos` and `windows` targets.
 
 ## Use With Docker
 
