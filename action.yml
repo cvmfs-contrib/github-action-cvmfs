@@ -332,12 +332,7 @@ runs:
   using: "composite"
   steps:
     - run: |
-        if [ "${{ inputs.run_local_checkout }}" == "true" ]; then
-          echo "WARNING running local checkout of the action !"
-          .  setup-cvmfs.sh local
-        else
-          ${{ github.action_path }}/setup-cvmfs.sh
-        fi
+        ${{ github.action_path }}/setup-cvmfs.sh
       shell: bash
       env:
         THIS: ${{ github.action_path }}
