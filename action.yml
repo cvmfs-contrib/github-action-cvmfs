@@ -4,6 +4,10 @@ branding:
   icon: 'folder'
   color: 'orange'
 inputs:
+  apt_cache:
+    description: 'Location (directory) of the user-space apt cache.'
+    required: false
+    default: '~/.apt'
   cvmfs_alien_cache:
     description: 'If set, use an alien cache at the given location.'
     required: false
@@ -336,6 +340,7 @@ runs:
       shell: bash
       env:
         ACTION_PATH: ${{ github.action_path }}
+        APT_CACHE: ${{ inputs.apt_cache }}
         CVMFS_ALIEN_CACHE: ${{ inputs.cvmfs_alien_cache }}
         CVMFS_ALT_ROOT_PATH: ${{ inputs.cvmfs_alt_root_path }}
         CVMFS_AUTHZ_HELPER: ${{ inputs.cvmfs_authz_helper }}
