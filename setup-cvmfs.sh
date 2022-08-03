@@ -27,11 +27,7 @@ else
   exit 1
 fi
 
-if [ "$1" == "local" ]; then
-  . createConfig.sh
-else
-  $THIS/createConfig.sh
-fi
+${ACTION_PATH}/createConfig.sh
 
 echo "Run cvmfs_config setup"
 sudo cvmfs_config setup

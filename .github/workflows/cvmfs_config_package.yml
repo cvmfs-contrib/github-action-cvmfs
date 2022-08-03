@@ -5,12 +5,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: cvmfs-contrib/github-action-cvmfs@main
+    - uses: ./
       with:
         cvmfs_repositories: 'pilot.eessi-hpc.org'
         cvmfs_http_proxy: 'DIRECT'
         cvmfs_config_package: 'https://github.com/EESSI/filesystem-layer/releases/download/v0.4.0/cvmfs-config-eessi_0.4.0_all.deb'
-        run_local_checkout: 'true'
     - name: Test CernVM-FS
       run: |
         echo "### Dump default.local ###"
