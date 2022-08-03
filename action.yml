@@ -335,7 +335,7 @@ runs:
         ${{ github.action_path }}/setup-cvmfs.sh
       shell: bash
       env:
-        THIS: ${{ github.action_path }}
+        ACTION_PATH: ${{ github.action_path }}
         CVMFS_ALIEN_CACHE: ${{ inputs.cvmfs_alien_cache }}
         CVMFS_ALT_ROOT_PATH: ${{ inputs.cvmfs_alt_root_path }}
         CVMFS_AUTHZ_HELPER: ${{ inputs.cvmfs_authz_helper }}
