@@ -25,8 +25,10 @@ if [ "$(uname)" == "Linux" ]; then
     sudo dpkg -i ${APT_ARCHIVES}/cvmfs-config.deb
   fi
   # update cache (avoid restricted partial directories)
-  cp /var/cache/apt/archives/*.deb ${APT_CACHE}/archives/
-  cp /var/lib/apt/lists/*_dists_* ${APT_CACHE}/lists/
+  if [ -n "${APT_CACHE}" ]; then
+    cp /var/cache/apt/archives/*.deb ${APT_CACHE}/archives/
+    cp /var/lib/apt/lists/*_dists_* ${APT_CACHE}/lists/
+  fi
 elif [ "$(uname)" == "Darwin" ]; then
   # Warn about the phasing out of MacOS support for this action
   echo "::warning::The CernVM-FS GitHub Action's support for MacOS will be \
