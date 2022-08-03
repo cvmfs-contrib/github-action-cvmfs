@@ -1,9 +1,14 @@
 name: ubuntu
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron:  '44 4 * * *'
 jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, ubuntu-18.04, ubuntu-20.04]
     steps:
