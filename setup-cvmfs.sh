@@ -1,16 +1,22 @@
 #!/usr/bin/env bash
 
-#Platform specific install
+# Platform specific install
 if [ "$(uname)" == "Linux" ]; then
-  curl -L -o cvmfs-release-latest_all.deb ${CVMFS_UBUNTU_DEB_LOCATION}
-  sudo dpkg -i cvmfs-release-latest_all.deb
+  # install cvmfs release package
+  APT_ARCHIVES=/var/cache/apt/archives/
+  if [ ! -f ${APT_ARCHIVES}/cvmfs-release-latest_all.deb ] ; then
+    sudo curl -L -o ${APT_ARCHIVES}/cvmfs-release-latest_all.deb ${CVMFS_UBUNTU_DEB_LOCATION}
+  fi
+  sudo dpkg -i ${APT_ARCHIVES}/cvmfs-release-latest_all.deb
+  # install cvmfs package
   sudo apt-get -q update
   sudo apt-get -q -y install cvmfs
+  # install cvmfs config package
   if [ "${CVMFS_CONFIG_PACKAGE}" == "cvmfs-config-default" ]; then
     sudo apt-get -q -y install cvmfs-config-default
   else
-    curl -L -o cvmfs-config.deb ${CVMFS_CONFIG_PACKAGE}
-    sudo dpkg -i cvmfs-config.deb
+    sudo curl -L -o ${APT_ARCHIVES}/cvmfs-config.deb ${CVMFS_CONFIG_PACKAGE}
+    sudo dpkg -i ${APT_ARCHIVES}/cvmfs-config.deb
   fi
 elif [ "$(uname)" == "Darwin" ]; then
   # Warn about the phasing out of MacOS support for this action
