@@ -2,6 +2,12 @@
 
 # Platform specific install
 if [ "$(uname)" == "Linux" ]; then
+  # download from cache
+  if [ -n "${APT_CACHE}" ]; then
+    mkdir -p ${APT_CACHE}/archives/ ${APT_CACHE}/lists/
+    sudo cp -r ${APT_CACHE}/archives /var/cache/apt
+    sudo cp -r ${APT_CACHE}/lists /var/lib/apt
+  fi
   # install cvmfs release package
   APT_ARCHIVES=/var/cache/apt/archives/
   if [ ! -f ${APT_ARCHIVES}/cvmfs-release-latest_all.deb ] ; then
@@ -18,6 +24,9 @@ if [ "$(uname)" == "Linux" ]; then
     sudo curl -L -o ${APT_ARCHIVES}/cvmfs-config.deb ${CVMFS_CONFIG_PACKAGE}
     sudo dpkg -i ${APT_ARCHIVES}/cvmfs-config.deb
   fi
+  # update cache (avoid restricted partial directories)
+  cp /var/cache/apt/archives/*.deb ${APT_CACHE}/archives/
+  cp /var/lib/apt/lists/*_dists_* ${APT_CACHE}/lists/
 elif [ "$(uname)" == "Darwin" ]; then
   # Warn about the phasing out of MacOS support for this action
   echo "::warning::The CernVM-FS GitHub Action's support for MacOS will be \
