@@ -6,13 +6,11 @@ if [ "$(uname)" == "Linux" ]; then
   sudo dpkg -i cvmfs-release-latest_all.deb
   sudo apt-get -q update
   sudo apt-get -q -y install cvmfs
-  rm -f cvmfs-release-latest_all.deb
   if [ "${CVMFS_CONFIG_PACKAGE}" == "cvmfs-config-default" ]; then
     sudo apt-get -q -y install cvmfs-config-default
   else
     curl -L -o cvmfs-config.deb ${CVMFS_CONFIG_PACKAGE}
     sudo dpkg -i cvmfs-config.deb
-    rm -f cvmfs-config.deb
   fi
 elif [ "$(uname)" == "Darwin" ]; then
   # Warn about the phasing out of MacOS support for this action
