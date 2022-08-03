@@ -13,10 +13,9 @@ jobs:
         os: [macos-latest, macos-10.15, macos-11]
     steps:
     - uses: actions/checkout@v2
-    - uses: cvmfs-contrib/github-action-cvmfs@main
+    - uses: .
       with:
         cvmfs_repositories: 'sft.cern.ch'
-        run_local_checkout: 'true'
     - name: Test CernVM-FS
       run: |
        echo "### Dump default.local ###"
