@@ -4,6 +4,7 @@
 if [ "$(uname)" == "Linux" ]; then
   # download from cache
   if [ -n "${APT_CACHE}" ]; then
+    echo "Copying cache from ${APT_CACHE} to system locations..."
     mkdir -p ${APT_CACHE}/archives/ ${APT_CACHE}/lists/
     sudo cp -r ${APT_CACHE}/archives /var/cache/apt
     sudo cp -r ${APT_CACHE}/lists /var/lib/apt
@@ -26,6 +27,7 @@ if [ "$(uname)" == "Linux" ]; then
   fi
   # update cache (avoid restricted partial directories)
   if [ -n "${APT_CACHE}" ]; then
+    echo "Copying cache from system locations to ${APT_CACHE}..."
     mkdir -p ${APT_CACHE}/archives/ ${APT_CACHE}/lists/
     cp /var/cache/apt/archives/*.deb ${APT_CACHE}/archives/
     cp /var/lib/apt/lists/*_dists_* ${APT_CACHE}/lists/
