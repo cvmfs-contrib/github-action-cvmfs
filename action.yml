@@ -7,7 +7,7 @@ inputs:
   apt_cache:
     description: 'Location (directory) of the user-space apt cache.'
     required: false
-    default: '~/.apt'
+    default: 'apt_cache'
   cvmfs_alien_cache:
     description: 'If set, use an alien cache at the given location.'
     required: false
