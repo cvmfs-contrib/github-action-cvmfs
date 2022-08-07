@@ -26,6 +26,7 @@ if [ "$(uname)" == "Linux" ]; then
   fi
   # update cache (avoid restricted partial directories)
   if [ -n "${APT_CACHE}" ]; then
+    mkdir -p ${APT_CACHE}/archives/ ${APT_CACHE}/lists/
     cp /var/cache/apt/archives/*.deb ${APT_CACHE}/archives/
     cp /var/lib/apt/lists/*_dists_* ${APT_CACHE}/lists/
   fi
