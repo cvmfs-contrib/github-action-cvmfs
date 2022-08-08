@@ -1,18 +1,36 @@
 #!/usr/bin/env bash
 
-#Platform specific install
+# Platform specific install
 if [ "$(uname)" == "Linux" ]; then
-  curl -L -o cvmfs-release-latest_all.deb ${CVMFS_UBUNTU_DEB_LOCATION}
-  sudo dpkg -i cvmfs-release-latest_all.deb
+  # download from cache
+  if [ -n "${APT_CACHE}" ]; then
+    echo "Copying cache from ${APT_CACHE} to system locations..."
+    mkdir -p ${APT_CACHE}/archives/ ${APT_CACHE}/lists/
+    sudo cp -r ${APT_CACHE}/archives /var/cache/apt
+    sudo cp -r ${APT_CACHE}/lists /var/lib/apt
+  fi
+  # install cvmfs release package
+  APT_ARCHIVES=/var/cache/apt/archives/
+  if [ ! -f ${APT_ARCHIVES}/cvmfs-release-latest_all.deb ] ; then
+    sudo curl -L -o ${APT_ARCHIVES}/cvmfs-release-latest_all.deb ${CVMFS_UBUNTU_DEB_LOCATION}
+  fi
+  sudo dpkg -i ${APT_ARCHIVES}/cvmfs-release-latest_all.deb
+  # install cvmfs package
   sudo apt-get -q update
   sudo apt-get -q -y install cvmfs
-  rm -f cvmfs-release-latest_all.deb
+  # install cvmfs config package
   if [ "${CVMFS_CONFIG_PACKAGE}" == "cvmfs-config-default" ]; then
     sudo apt-get -q -y install cvmfs-config-default
   else
-    curl -L -o cvmfs-config.deb ${CVMFS_CONFIG_PACKAGE}
-    sudo dpkg -i cvmfs-config.deb
-    rm -f cvmfs-config.deb
+    sudo curl -L -o ${APT_ARCHIVES}/cvmfs-config.deb ${CVMFS_CONFIG_PACKAGE}
+    sudo dpkg -i ${APT_ARCHIVES}/cvmfs-config.deb
+  fi
+  # update cache (avoid restricted partial directories)
+  if [ -n "${APT_CACHE}" ]; then
+    echo "Copying cache from system locations to ${APT_CACHE}..."
+    mkdir -p ${APT_CACHE}/archives/ ${APT_CACHE}/lists/
+    cp /var/cache/apt/archives/*.deb ${APT_CACHE}/archives/
+    cp /var/lib/apt/lists/*_dists_* ${APT_CACHE}/lists/
   fi
 elif [ "$(uname)" == "Darwin" ]; then
   # Warn about the phasing out of MacOS support for this action

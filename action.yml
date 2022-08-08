@@ -4,6 +4,10 @@ branding:
   icon: 'folder'
   color: 'orange'
 inputs:
+  apt_cache:
+    description: 'Location (directory) of the user-space apt cache.'
+    required: false
+    default: 'apt_cache'
   cvmfs_alien_cache:
     description: 'If set, use an alien cache at the given location.'
     required: false
@@ -331,11 +335,26 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - id: lsb-release
+      run: |
+        source /etc/lsb-release
+        echo "::set-output name=id::${DISTRIB_ID}"
+        echo "::set-output name=release::${DISTRIB_RELEASE}"
+        echo "::set-output name=codename::${DISTRIB_CODENAME}"
+        echo "::set-output name=description::${DISTRIB_DESCRIPTION}"
+        echo "::set-output name=id-release::${DISTRIB_ID}-${DISTRIB_DESCRIPTION}"
+      shell: bash
+    - uses: actions/cache@v3
+      with:
+        key: cvmfs-apt-cache-${{ steps.lsb-release.outputs.id-release }}-${{ hashFiles('action.yml') }}
+        path: |
+          ${{ inputs.apt_cache }}
     - run: |
         ${{ github.action_path }}/setup-cvmfs.sh
       shell: bash
       env:
         ACTION_PATH: ${{ github.action_path }}
+        APT_CACHE: ${{ inputs.apt_cache }}
         CVMFS_ALIEN_CACHE: ${{ inputs.cvmfs_alien_cache }}
         CVMFS_ALT_ROOT_PATH: ${{ inputs.cvmfs_alt_root_path }}
         CVMFS_AUTHZ_HELPER: ${{ inputs.cvmfs_authz_helper }}
