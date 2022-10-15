@@ -338,11 +338,11 @@ runs:
     - id: lsb-release
       run: |
         source /etc/lsb-release
-        echo "::set-output name=id::${DISTRIB_ID}"
-        echo "::set-output name=release::${DISTRIB_RELEASE}"
-        echo "::set-output name=codename::${DISTRIB_CODENAME}"
-        echo "::set-output name=description::${DISTRIB_DESCRIPTION}"
-        echo "::set-output name=id-release::${DISTRIB_ID}-${DISTRIB_DESCRIPTION}"
+        echo "id=${DISTRIB_ID}" >> $GITHUB_OUTPUT
+        echo "release=${DISTRIB_RELEASE}" >> $GITHUB_OUTPUT
+        echo "codename=${DISTRIB_CODENAME}" >> $GITHUB_OUTPUT
+        echo "description=${DISTRIB_DESCRIPTION}" >> $GITHUB_OUTPUT
+        echo "id-release=${DISTRIB_ID}-${DISTRIB_DESCRIPTION}" >> $GITHUB_OUTPUT
       shell: bash
     - uses: actions/cache@v3
       with:
