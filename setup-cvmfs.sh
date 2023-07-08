@@ -4,18 +4,23 @@
 if [ "$(uname)" == "Linux" ]; then
   # download from cache
   if [ -n "${APT_CACHE}" ]; then
+    echo "::group::Using cache"
     echo "Copying cache from ${APT_CACHE} to system locations..."
     mkdir -p ${APT_CACHE}/archives/ ${APT_CACHE}/lists/
     sudo cp -r ${APT_CACHE}/archives /var/cache/apt
     sudo cp -r ${APT_CACHE}/lists /var/lib/apt
+    echo "::end group::"
   fi
   # install cvmfs release package
+  echo "::group::Installing cvmfs-release"
   APT_ARCHIVES=/var/cache/apt/archives/
   if [ ! -f ${APT_ARCHIVES}/cvmfs-release-latest_all.deb ] ; then
     sudo curl -L -o ${APT_ARCHIVES}/cvmfs-release-latest_all.deb ${CVMFS_UBUNTU_DEB_LOCATION}
   fi
   sudo dpkg -i ${APT_ARCHIVES}/cvmfs-release-latest_all.deb
+  echo "::endgroup::"
   # install cvmfs package
+  echo "::group::Installing cvmfs"
   sudo apt-get -q update
   sudo apt-get -q -y install cvmfs
   # install cvmfs config package
@@ -25,12 +30,15 @@ if [ "$(uname)" == "Linux" ]; then
     sudo curl -L -o ${APT_ARCHIVES}/cvmfs-config.deb ${CVMFS_CONFIG_PACKAGE}
     sudo dpkg -i ${APT_ARCHIVES}/cvmfs-config.deb
   fi
+  echo "::endgroup::"
   # update cache (avoid restricted partial directories)
   if [ -n "${APT_CACHE}" ]; then
+    echo "::group::Updating cache"
     echo "Copying cache from system locations to ${APT_CACHE}..."
     mkdir -p ${APT_CACHE}/archives/ ${APT_CACHE}/lists/
     cp /var/cache/apt/archives/*.deb ${APT_CACHE}/archives/
     cp /var/lib/apt/lists/*_dists_* ${APT_CACHE}/lists/
+    echo "::endgroup::"
   fi
 elif [ "$(uname)" == "Darwin" ]; then
   # Warn about the phasing out of MacOS support for this action
@@ -50,7 +58,7 @@ fi
 
 ${ACTION_PATH}/createConfig.sh
 
-echo "Run cvmfs_config setup"
+echo "::group::Running cvmfs_config setup"
 sudo cvmfs_config setup
 retCongif=$?
 if [ $retCongif -ne 0 ]; then
@@ -58,6 +66,7 @@ if [ $retCongif -ne 0 ]; then
   echo "cvmfs_config setup exited with ${retCongif}"
   exit $retCongif
 fi
+echo "::endgroup::"
 
 
 if [ "$(uname)" == "Darwin" ]; then
