@@ -9,7 +9,7 @@ if [ "$(uname)" == "Linux" ]; then
     mkdir -p ${APT_CACHE}/archives/ ${APT_CACHE}/lists/
     sudo cp -r ${APT_CACHE}/archives /var/cache/apt
     sudo cp -r ${APT_CACHE}/lists /var/lib/apt
-    echo "::end group::"
+    echo "::endgroup::"
   fi
   # install cvmfs release package
   echo "::group::Installing cvmfs-release"
