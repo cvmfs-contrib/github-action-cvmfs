@@ -1,0 +1,27 @@
+name: macOS
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron:  '33 3 * * *'
+jobs:
+  macOS-minimal:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, macos-11]
+    steps:
+    - uses: actions/checkout@v2
+    - uses: Homebrew/actions/setup-homebrew@master
+    - uses: ./
+      with:
+        cvmfs_repositories: 'sft.cern.ch'
+    - name: Test CernVM-FS
+      run: |
+       echo "### Dump default.local ###"
+       cat /etc/cvmfs/default.local
+       echo "### Try to ls on /Users/Shared/cvmfs/sft.cern.ch/ ###"
+       ls /Users/Shared/cvmfs/sft.cern.ch/
+       echo "### Try to ls on /cvmfs/sft.cern.ch/ ###"
+       ls /cvmfs/sft.cern.ch/
