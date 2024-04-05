@@ -321,9 +321,12 @@ inputs:
     required: false
     default: 'https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest_all.deb'
   cvmfs_macos_pkg_location:
-    description: 'Location from where to download the masOS pkg package of CernVM-FS'
+    description: 'Location from where to download the macOS pkg package of CernVM-FS'
     required: false
-    default: 'http://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-latest.pkg'
+    #default: 'http://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-latest.pkg'
+    # this nightly build is based on the cvmfs mac-fuse-t branch
+    # TODO: change back to latest once it is released
+    default: 'http://ecsft.cern.ch/dist/cvmfs/nightlies/cvmfs-git-1234/cvmfs-2.12.0-0.1234-git-958741c6df468802.pkg'
   cvmfs_config_package:
     description: 'URL to the cvmfs config package to install'
     required: false
@@ -337,12 +340,16 @@ runs:
   steps:
     - id: lsb-release
       run: |
-        source /etc/lsb-release
-        echo "id=${DISTRIB_ID}" >> $GITHUB_OUTPUT
-        echo "release=${DISTRIB_RELEASE}" >> $GITHUB_OUTPUT
-        echo "codename=${DISTRIB_CODENAME}" >> $GITHUB_OUTPUT
-        echo "description=${DISTRIB_DESCRIPTION}" >> $GITHUB_OUTPUT
-        echo "id-release=${DISTRIB_ID}-${DISTRIB_DESCRIPTION}" >> $GITHUB_OUTPUT
+        if [ "$RUNNER_OS" == "Linux" ]; then
+          source /etc/lsb-release
+          echo "id=${DISTRIB_ID}" >> $GITHUB_OUTPUT
+          echo "release=${DISTRIB_RELEASE}" >> $GITHUB_OUTPUT
+          echo "codename=${DISTRIB_CODENAME}" >> $GITHUB_OUTPUT
+          echo "description=${DISTRIB_DESCRIPTION}" >> $GITHUB_OUTPUT
+          echo "id-release=${DISTRIB_ID}-${DISTRIB_DESCRIPTION}" >> $GITHUB_OUTPUT
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+          echo "id-release=macOS-$(sw_vers -productVersion)" >> $GITHUB_OUTPUT
+        fi
       shell: bash
     - uses: actions/cache@v4
       with:

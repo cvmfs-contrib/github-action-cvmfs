@@ -42,15 +42,24 @@ if [ "$(uname)" == "Linux" ]; then
   fi
 elif [ "$(uname)" == "Darwin" ]; then
   # Warn about the phasing out of MacOS support for this action
-  echo "::error::The CernVM-FS GitHub Action's support for MacOS has been \
-phased out with macos-10.15."
+  echo "warning The CernVM-FS GitHub Action's support for MacOS  \
+        is still experimental."
   # Temporary fix for macOS until cvmfs 2.8 is released
   if [ -z "${CVMFS_HTTP_PROXY}" ]; then
     export CVMFS_HTTP_PROXY='DIRECT'
   fi
-  brew install --cask macfuse
+
+  wget -q https://github.com/macos-fuse-t/fuse-t/releases/download/1.0.36/fuse-t-macos-installer-1.0.36.pkg
+  sudo installer -pkg fuse-t-macos-installer-1.0.36.pkg -target /
+
   curl -L -o cvmfs-latest.pkg ${CVMFS_MACOS_PKG_LOCATION}
   sudo installer -package cvmfs-latest.pkg -target /
+  # / is readonly on macos 11+ - do 'synthetic firmlink' to create /cvmfs
+  sudo zsh -c 'echo -e "cvmfs\tUsers/Shared/cvmfs\n#comment\n" > /etc/synthetic.conf'
+  sudo chown root:wheel /etc/synthetic.conf
+  sudo chmod a+r /etc/synthetic.conf
+  # apfs.util seems to return non-zero error codes also on success
+  sudo /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t || true
 else
   echo "Unsupported platform"
   exit 1

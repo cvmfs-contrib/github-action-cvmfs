@@ -135,7 +135,9 @@ This GitHub Action installs the [CernVM-FS package](https://cernvm.cern.ch/fs/#d
 
 ## Limitations
 
-This GitHub Action is only expected to work in workflows that [run on](https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on) ubuntu. This exludes the `macos` and `windows` targets.
+This GitHub Action is only expected to work in workflows that [run on](https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on) ubuntu. There is experimental support for `macOS` (11+).
+
+ `windows` targets are not supported.
 
 ## Use With Docker
 
