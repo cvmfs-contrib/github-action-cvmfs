@@ -321,7 +321,7 @@ inputs:
     required: false
     default: 'https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest_all.deb'
   cvmfs_macos_pkg_location:
-    description: 'Location from where to download the masOS pkg package of CernVM-FS'
+    description: 'Location from where to download the macOS pkg package of CernVM-FS'
     required: false
     #default: 'http://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-latest.pkg'
     # this nightly build is based on the cvmfs mac-fuse-t branch
