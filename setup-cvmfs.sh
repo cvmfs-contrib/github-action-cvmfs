@@ -49,11 +49,10 @@ elif [ "$(uname)" == "Darwin" ]; then
     export CVMFS_HTTP_PROXY='DIRECT'
   fi
 
-  wget -q https://github.com/macos-fuse-t/fuse-t/releases/download/1.0.36/fuse-t-macos-installer-1.0.36.pkg
-  sudo installer -pkg fuse-t-macos-installer-1.0.36.pkg -target /
+  brew tap macos-fuse-t/cask
+  brew tap cvmfs/homebrew-cvmfs
+  brew install cvmfs
 
-  curl -L -o cvmfs-latest.pkg ${CVMFS_MACOS_PKG_LOCATION}
-  sudo installer -package cvmfs-latest.pkg -target /
   # / is readonly on macos 11+ - do 'synthetic firmlink' to create /cvmfs
   sudo zsh -c 'echo -e "cvmfs\tUsers/Shared/cvmfs\n#comment\n" > /etc/synthetic.conf'
   sudo chown root:wheel /etc/synthetic.conf
