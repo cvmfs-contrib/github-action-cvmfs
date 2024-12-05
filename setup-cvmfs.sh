@@ -53,12 +53,14 @@ elif [ "$(uname)" == "Darwin" ]; then
   brew tap cvmfs/homebrew-cvmfs
   brew install cvmfs
 
+
   # / is readonly on macos 11+ - do 'synthetic firmlink' to create /cvmfs
   sudo zsh -c 'echo -e "cvmfs\tUsers/Shared/cvmfs\n#comment\n" > /etc/synthetic.conf'
   sudo chown root:wheel /etc/synthetic.conf
   sudo chmod a+r /etc/synthetic.conf
   # apfs.util seems to return non-zero error codes also on success
   sudo /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t || true
+
 else
   echo "Unsupported platform"
   exit 1
@@ -83,4 +85,6 @@ if [ "$(uname)" == "Darwin" ]; then
     mkdir -p /Users/Shared/cvmfs/${repo}
     sudo mount -t cvmfs ${repo} /Users/Shared/cvmfs/${repo}
   done
+  # Fuse-t can have a brief lag after mounting  before the mountpoint responds 
+  sleep 3
 fi
