@@ -20,7 +20,6 @@ jobs:
       run: |
        echo "### Dump default.local ###"
        cat /etc/cvmfs/default.local
-       sleep 5
        echo "### Try to ls on /Users/Shared/cvmfs/sft.cern.ch/ ###"
        ls /Users/Shared/cvmfs/sft.cern.ch/ | grep lcg
        echo "### Try to ls on /cvmfs/sft.cern.ch/ ###"
