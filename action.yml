@@ -343,11 +343,12 @@ runs:
           echo "arch=$(uname -m)" >> $GITHUB_OUTPUT
         elif [ "$RUNNER_OS" == "macOS" ]; then
           echo "id-release=macOS-$(sw_vers -productVersion)" >> $GITHUB_OUTPUT
+          echo "arch=$(uname -m)" >> $GITHUB_OUTPUT
         fi
       shell: bash
     - uses: actions/cache@v4
       with:
-        key: cvmfs-apt-cache-${{ steps.lsb-release.outputs.id-release }}-${{ hashFiles('action.yml') }}
+        key: cvmfs-apt-cache-${{ steps.lsb-release.outputs.id-release }}-${{ steps.lsb-release.outputs.id-release }}-${{ hashFiles('action.yml') }}
         path: |
           ${{ inputs.apt_cache }}
     - run: |
