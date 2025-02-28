@@ -348,7 +348,7 @@ runs:
       shell: bash
     - uses: actions/cache@v4
       with:
-        key: cvmfs-apt-cache-${{ steps.lsb-release.outputs.id-release }}-${{ steps.lsb-release.outputs.id-release }}-${{ hashFiles('action.yml') }}
+        key: cvmfs-apt-cache-${{ steps.lsb-release.outputs.id-release }}-${{ steps.lsb-release.outputs.arch }}-${{ hashFiles('action.yml') }}
         path: |
           ${{ inputs.apt_cache }}
     - run: |
