@@ -340,6 +340,7 @@ runs:
           echo "codename=${DISTRIB_CODENAME}" >> $GITHUB_OUTPUT
           echo "description=${DISTRIB_DESCRIPTION}" >> $GITHUB_OUTPUT
           echo "id-release=${DISTRIB_ID}-${DISTRIB_DESCRIPTION}" >> $GITHUB_OUTPUT
+          echo "arch=$(uname -m)" >> $GITHUB_OUTPUT
         elif [ "$RUNNER_OS" == "macOS" ]; then
           echo "id-release=macOS-$(sw_vers -productVersion)" >> $GITHUB_OUTPUT
         fi
