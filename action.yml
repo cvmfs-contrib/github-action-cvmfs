@@ -129,9 +129,9 @@ inputs:
     required: false
     default: ''
   cvmfs_http_proxy:
-    description: 'Chain of HTTP proxy groups used by CernVM-FS. Necessary.Set to DIRECT if you don’t use proxies.'
+    description: 'Chain of HTTP proxy groups used by CernVM-FS. Defaults to DIRECT.'
     required: false
-    default: ''
+    default: 'DIRECT'
   cvmfs_ignore_signature:
     description: 'When set to yes, don’t verify CernVM-FS file catalog signatures.'
     required: false

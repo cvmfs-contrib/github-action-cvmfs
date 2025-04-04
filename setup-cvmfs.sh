@@ -44,10 +44,6 @@ elif [ "$(uname)" == "Darwin" ]; then
   # Warn about the phasing out of MacOS support for this action
   echo "warning The CernVM-FS GitHub Action's support for MacOS  \
         is still experimental."
-  # Temporary fix for macOS until cvmfs 2.8 is released
-  if [ -z "${CVMFS_HTTP_PROXY}" ]; then
-    export CVMFS_HTTP_PROXY='DIRECT'
-  fi
 
   brew tap macos-fuse-t/cask
   brew tap cvmfs/homebrew-cvmfs
