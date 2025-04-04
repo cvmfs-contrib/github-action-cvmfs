@@ -44,10 +44,6 @@ elif [ "$(uname)" == "Darwin" ]; then
   # Warn about the phasing out of MacOS support for this action
   echo "::error::The CernVM-FS GitHub Action's support for MacOS has been \
 phased out with macos-10.15."
-  # Temporary fix for macOS until cvmfs 2.8 is released
-  if [ -z "${CVMFS_HTTP_PROXY}" ]; then
-    export CVMFS_HTTP_PROXY='DIRECT'
-  fi
   brew install --cask macfuse
   curl -L -o cvmfs-latest.pkg ${CVMFS_MACOS_PKG_LOCATION}
   sudo installer -package cvmfs-latest.pkg -target /
