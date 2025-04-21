@@ -1,0 +1,22 @@
+name: cache
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron:  '44 4 * * *'
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-20.04, ubuntu-22.04]
+    steps:
+    - uses: actions/checkout@v4
+    - uses: ./
+      with:
+        actions_cache: true
+    - name: Test CernVM-FS
+      run: |
+        source /cvmfs/sft.cern.ch/lcg/views/LCG_107/x86_64-ubuntu2404-gcc13-opt/setup.sh
+        root -l -q -b
