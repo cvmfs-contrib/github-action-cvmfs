@@ -13,6 +13,7 @@ jobs:
         os: [ubuntu-24.04]
     steps:
     - uses: actions/checkout@v4
+    - run: mkdir -p ${{ github.workspace }}/.cvmfs
     - uses: ./
       with:
         actions_cache: true
