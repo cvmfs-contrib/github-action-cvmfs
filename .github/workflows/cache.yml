@@ -10,13 +10,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, ubuntu-20.04, ubuntu-22.04, ubuntu-24.04]
+        os: [ubuntu-24.04]
     steps:
     - uses: actions/checkout@v4
     - uses: ./
       with:
         actions_cache: true
-        cvmfs_cache_base: /var/lib/cvmfs
+        cvmfs_cache_base: ${{ github.workspace }}/.cvmfs
     - name: Test CernVM-FS
       run: |
         source /cvmfs/sft.cern.ch/lcg/views/LCG_107/x86_64-ubuntu2404-gcc13-opt/setup.sh
