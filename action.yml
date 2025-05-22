@@ -339,7 +339,7 @@ runs:
           echo "release=${DISTRIB_RELEASE}" >> $GITHUB_OUTPUT
           echo "codename=${DISTRIB_CODENAME}" >> $GITHUB_OUTPUT
           echo "description=${DISTRIB_DESCRIPTION}" >> $GITHUB_OUTPUT
-          echo "id-release=${DISTRIB_ID}-${DISTRIB_DESCRIPTION}" >> $GITHUB_OUTPUT
+          echo "id-release=${DISTRIB_ID}-${DISTRIB_RELEASE}" >> $GITHUB_OUTPUT
           echo "arch=$(uname -m)" >> $GITHUB_OUTPUT
         elif [ "$RUNNER_OS" == "macOS" ]; then
           echo "id-release=macOS-$(sw_vers -productVersion)" >> $GITHUB_OUTPUT
@@ -348,7 +348,7 @@ runs:
       shell: bash
     - uses: actions/cache@v4
       with:
-        key: cvmfs-apt-cache-${{ steps.lsb-release.outputs.id-release }}-${{ steps.lsb-release.outputs.arch }}-${{ hashFiles('action.yml') }}
+        key: cvmfs-apt-cache-${{ steps.lsb-release.outputs.id-release }}-${{ steps.lsb-release.outputs.arch }}
         path: |
           ${{ inputs.apt_cache }}
     - run: |
