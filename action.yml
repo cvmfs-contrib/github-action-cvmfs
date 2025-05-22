@@ -349,7 +349,7 @@ runs:
         ACTION_VERSION=$(basename "$GITHUB_ACTION_PATH")
         ACTION_NAME=$(basename $(dirname "$GITHUB_ACTION_PATH"))
         ACTION_OWNER=$(basename $(dirname $(dirname "$GITHUB_ACTION_PATH")))
-        echo "cvmfs_action_version=$ACTION_OWNER_$ACTION_NAME_$ACTION_VERSION" >> $GITHUB_ENV
+        echo "cvmfs_action_version=$ACTION_OWNER_$ACTION_NAME_$ACTION_VERSION" >> $GITHUB_OUTPUT
       shell: bash
     - uses: actions/cache@v4
       with:
