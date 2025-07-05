@@ -21,6 +21,7 @@ if [ "$(uname)" == "Linux" ]; then
   echo "::endgroup::"
   # install cvmfs package
   echo "::group::Installing cvmfs"
+  sudo rm -f /var/lib/man-db/auto-update
   sudo apt-get -q update
   sudo apt-get -q -y install cvmfs
   # install cvmfs config package
@@ -30,6 +31,7 @@ if [ "$(uname)" == "Linux" ]; then
     sudo curl -L -o ${APT_ARCHIVES}/cvmfs-config.deb ${CVMFS_CONFIG_PACKAGE}
     sudo dpkg -i ${APT_ARCHIVES}/cvmfs-config.deb
   fi
+  sudo touch /var/lib/man-db/auto-update
   echo "::endgroup::"
   # update cache (avoid restricted partial directories)
   if [ -n "${APT_CACHE}" ]; then
