@@ -139,7 +139,7 @@ This repository includes a pre-configured devcontainer for a consistent developm
 
 To use it, open this repository in a devcontainer-compatible editor like VS Code with the Dev Containers extension.
 
-You can add other functionalities to your devcontainer by including more features. A comprehensive list of contributed features can be found in the [devcontainer feature index](https://github.com/devcontainers/devcontainers.github.io/blob/gh-pages/_data/collection-index.yml).
+You can add other functionalities to your devcontainer by including more features. A comprehensive list of contributed features can be found in the [devcontainer feature index](https://containers.dev/features).
 
 For example, you can add the following to your `devcontainer.json` to use this feature:
 ```json
