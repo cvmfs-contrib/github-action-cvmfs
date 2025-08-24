@@ -1,0 +1,21 @@
+name: Publish Devcontainer Feature
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Devcontainer CLI
+        run: npm install -g @devcontainers/cli
+
+      - name: Login to GitHub Container Registry
+        run: echo "${{ secrets.WRITE_PACKAGES_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Publish Devcontainer Feature
+        run: devcontainer features publish src/cvmfs --namespace cvmfs-contrib
