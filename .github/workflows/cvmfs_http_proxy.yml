@@ -1,5 +1,9 @@
 name: with cvmfs_http_proxy
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron:  '11 1 * * *'
 jobs:
   build:
     runs-on: ubuntu-latest

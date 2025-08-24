@@ -1,5 +1,9 @@
 name: with cvmfs_repositories
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron:  '55 5 * * *'
 jobs:
   build:
     runs-on: ubuntu-latest
