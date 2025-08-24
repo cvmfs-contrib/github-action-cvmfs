@@ -11,7 +11,7 @@ if [ -n "${APT_CACHE}" ]; then
 fi
 
 # Call shared install logic
-sudo bash /workspaces/github-action-cvmfs/cvmfs-install-core.sh
+sudo bash "$(dirname "$0")/install-cvmfs-linux.sh
 
 # Optional: update cache after install
 if [ -n "${APT_CACHE}" ]; then

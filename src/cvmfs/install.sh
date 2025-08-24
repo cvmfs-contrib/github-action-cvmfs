@@ -3,4 +3,4 @@
 set -e
 
 # Use the shared core installer for Linux (relative path for feature packaging)
-bash "$(dirname "$0")/../../cvmfs-install-core.sh"
+bash "$(dirname "$0")/../../install-cvmfs-linux.sh"

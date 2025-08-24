@@ -21,3 +21,7 @@ do
   sudo mount -t cvmfs ${repo} /Users/Shared/cvmfs/${repo}
 done
 sleep 3
+
+# Configure CVMFS
+bash create-config.sh
+bash setup-cvmfs-config.sh

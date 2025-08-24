@@ -26,4 +26,6 @@ do
   fi
 done
 
-cvmfs_config setup
+# Configure CVMFS
+bash create-config.sh
+bash setup-cvmfs-config.sh
