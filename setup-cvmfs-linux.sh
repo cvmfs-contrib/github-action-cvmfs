@@ -10,8 +10,8 @@ if [ -n "${APT_CACHE}" ]; then
   sudo cp -r ${APT_CACHE}/lists /var/lib/apt
 fi
 
-# Call shared install logic
-sudo bash "$(dirname "$0")/install-cvmfs-linux.sh"
+# Call shared install logic (preserve environment with configuration)
+sudo -E bash "$(dirname "$0")/install-cvmfs-linux.sh"
 
 # Optional: update cache after install
 if [ -n "${APT_CACHE}" ]; then
