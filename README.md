@@ -133,12 +133,29 @@ jobs:
 
 This GitHub Action installs the [CernVM-FS package](https://cernvm.cern.ch/fs/#download), and configures it with the  `CVMFS_CLIENT_PROFILE='single'` and `CVMFS_USE_CDN='yes'` to avoid any overhead on the CernVM-FS stratum 1 servers that you are accessing, this GitHub Action uses the [OpenHTC](https://openhtc.io) caching edge servers.
 
+## Devcontainer Usage
+
+This repository includes a pre-configured devcontainer for a consistent development environment. It uses the CVMFS devcontainer feature located in the `src/cvmfs` directory.
+
+To use it, open this repository in a devcontainer-compatible editor like VS Code with the Dev Containers extension.
+
+You can add other functionalities to your devcontainer by including more features. A comprehensive list of contributed features can be found in the [devcontainer feature index](https://github.com/devcontainers/devcontainers.github.io/blob/gh-pages/_data/collection-index.yml).
+
+For example, you can add the following to your `devcontainer.json` to use this feature:
+```json
+{
+    "name": "CVMFS Action Dev",
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+        "ghcr.io/cvmfs-contrib/features/cvmfs:1": {
+            "CVMFS_REPOSITORIES": "alice.cern.ch,atlas.cern.ch"
+        }
+    }
+}
+```
+
 ## Limitations
 
 This GitHub Action is only expected to work in workflows that [run on](https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on) ubuntu. There is experimental support for `macOS` (11+).
 
  `windows` targets are not supported.
-
-## Use With Docker
-
-In case your workflow uses docker containers, the cvmfs directory can be mounted inside the container by using the flag `-v /cvmfs:/cvmfs:shared`.

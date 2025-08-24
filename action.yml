@@ -357,7 +357,14 @@ runs:
         path: |
           ${{ inputs.apt_cache }}
     - run: |
-        ${{ github.action_path }}/setup-cvmfs.sh
+        if [ "$RUNNER_OS" == "Linux" ]; then
+          ${{ github.action_path }}/setup-cvmfs-linux.sh
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+          ${{ github.action_path }}/setup-cvmfs-macos.sh
+        else
+          echo "Unsupported platform: $RUNNER_OS"
+          exit 1
+        fi
       shell: bash
       env:
         ACTION_PATH: ${{ github.action_path }}

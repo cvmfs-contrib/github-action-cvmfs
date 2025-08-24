@@ -1,0 +1,19 @@
+{
+    "name": "CVMFS",
+    "id": "cvmfs",
+    "version": "1.0.0",
+    "description": "Installs CVMFS client",
+    "options": {
+        "CVMFS_REPOSITORIES": {
+            "type": "string",
+            "default": "alice.cern.ch,atlas.cern.ch,cms.cern.ch,lhcb.cern.ch",
+            "description": "CVMFS repositories to enable"
+        },
+        "CVMFS_CONFIG_REPO": {
+            "type": "string",
+            "default": "",
+            "description": "URL of a repository with CVMFS config files"
+        }
+    },
+    "entrypoint": "install.sh"
+}
