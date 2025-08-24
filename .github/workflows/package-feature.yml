@@ -1,4 +1,4 @@
-name: with cvmfs_http_proxy
+name: Package Devcontainer Feature
 on: [push, pull_request]
 jobs:
   build:
