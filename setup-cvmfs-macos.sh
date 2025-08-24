@@ -24,4 +24,6 @@ do
   mkdir -p /Users/Shared/cvmfs/${repo}
   sudo mount -t cvmfs ${repo} /Users/Shared/cvmfs/${repo}
 done
+
+# Fuse-t can have a brief lag after mounting  before the mountpoint responds 
 sleep 3
