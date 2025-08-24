@@ -14,6 +14,10 @@ sudo chown root:wheel /etc/synthetic.conf
 sudo chmod a+r /etc/synthetic.conf
 sudo /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t || true
 
+# Configure CVMFS
+bash create-config.sh
+bash setup-cvmfs-config.sh
+
 # Mount repositories
 for repo in $(echo ${CVMFS_REPOSITORIES} | sed "s/,/ /g")
 do
@@ -21,7 +25,3 @@ do
   sudo mount -t cvmfs ${repo} /Users/Shared/cvmfs/${repo}
 done
 sleep 3
-
-# Configure CVMFS
-bash create-config.sh
-bash setup-cvmfs-config.sh
