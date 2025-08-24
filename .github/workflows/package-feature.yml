@@ -1,0 +1,14 @@
+name: with cvmfs_http_proxy
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+      - name: Install Devcontainer CLI
+        run: npm install -g @devcontainers/cli
+      - name: Package CVMFS Feature
+        run: devcontainer features package src/cvmfs/
+      - name: Generate CVMFS Feature Docs
+        run: devcontainer features generate-docs -p . -n cvmfs-contrib/cvmfs
