@@ -159,3 +159,7 @@ For example, you can add the following to your `devcontainer.json` to use this f
 This GitHub Action is only expected to work in workflows that [run on](https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on) ubuntu. There is experimental support for `macOS` (11+).
 
  `windows` targets are not supported.
+
+## Use With Docker
+
+In case your workflow uses docker containers, the cvmfs directory can be mounted inside the container by using the flag `-v /cvmfs:/cvmfs:shared`.
