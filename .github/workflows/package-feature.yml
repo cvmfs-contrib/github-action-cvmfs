@@ -11,4 +11,4 @@ jobs:
       - name: Package CVMFS Feature
         run: devcontainer features package src/cvmfs/
       - name: Generate CVMFS Feature Docs
-        run: devcontainer features generate-docs -p . -n cvmfs-contrib/cvmfs
+        run: devcontainer features generate-docs -p src/ -n cvmfs-contrib/cvmfs
