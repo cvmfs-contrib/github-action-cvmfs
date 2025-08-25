@@ -34,3 +34,9 @@ done
 # Configure CVMFS
 bash create-config.sh
 bash setup-cvmfs-config.sh
+
+# Mount repositories
+for repo in $(echo ${CVMFS_REPOSITORIES} | sed "s/,/ /g")
+do
+  sudo mount -t cvmfs ${repo} /cvmfs/${repo}
+done
