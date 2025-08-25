@@ -79,11 +79,11 @@ declare -a vars=(CVMFS_ALIEN_CACHE
                  CVMFS_WORKSPACE
 )
 
-sudo mkdir -p /etc/cvmfs
-echo "# cvmfs default.local file installed with cvmfs-contrib/github-action-cvmfs" | sudo tee /etc/cvmfs/default.local
+mkdir -p /etc/cvmfs
+echo "# cvmfs default.local file installed with cvmfs-contrib/github-action-cvmfs" | tee /etc/cvmfs/default.local
 for var_name in "${vars[@]}"
 do
   if [ ! -z "$(eval "echo \$$var_name")" ]; then
-    echo "$var_name='$(eval "echo \$$var_name")'" | sudo tee -a /etc/cvmfs/default.local
+    echo "$var_name='$(eval "echo \$$var_name")'" | tee -a /etc/cvmfs/default.local
   fi
 done
