@@ -13,7 +13,7 @@ dpkg -i ${APT_ARCHIVES}/cvmfs-release-latest_all.deb
 
 # Install CVMFS and config package
 apt-get -q update
-if [ -z "${CVMFS_CONFIG_PACKAGE}" ]; then
+if [ "${CVMFS_CONFIG_PACKAGE}" == "cvmfs-config-default" ]; then
   apt-get -q -y install cvmfs cvmfs-config-default
 else
   curl -L -o ${APT_ARCHIVES}/cvmfs-config.deb ${CVMFS_CONFIG_PACKAGE}
