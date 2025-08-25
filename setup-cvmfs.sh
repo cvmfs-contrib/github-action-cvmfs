@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-# Fail on errors
-set -e
-
 # Platform specific install
 if [ "$(uname)" == "Linux" ]; then
   # download from cache
