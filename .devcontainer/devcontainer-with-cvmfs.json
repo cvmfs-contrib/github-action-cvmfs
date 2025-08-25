@@ -1,0 +1,8 @@
+{
+    "name": "CVMFS Action Test",
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+        "ghcr.io/cvmfs-contrib/github-action-cvmfs/cvmfs": {}
+    },
+    "forwardPorts": []
+}
