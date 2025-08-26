@@ -1,0 +1,34 @@
+name: Publish Devcontainer Feature
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Install Devcontainer CLI
+        run: npm install -g @devcontainers/cli
+
+      - name: Login to GitHub Container Registry
+        run: echo "${{ secrets.WRITE_PACKAGES_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Add version to environment
+        run: |
+          VERSION="${{ github.ref_name }}"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Add version to devcontainer-feature.json
+        run: |
+          jq --arg VERSION "${{ env.VERSION }}" '.version = $VERSION' src/cvmfs/devcontainer-feature.json > tmp.json
+          mv tmp.json src/cvmfs/devcontainer-feature.json
+
+      - name: Publish Devcontainer Feature
+        run: devcontainer features publish --namespace ${{ github.actor }}/${{ github.repository }} .
+
+      - name: Build Devcontainer Feature
+        run: devcontainer build --workspace-folder . --image-name test-cvmfs-feature --additional-features ghcr.io/${{ github.actor }}/${{ github.repository }}/cvmfs:${{ env.VERSION }}
