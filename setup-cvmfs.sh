@@ -81,7 +81,9 @@ if [ "$(uname)" == "Linux" ]; then
   # Mount CVMFS repositories (in case no autofs)
   for repo in $(echo ${CVMFS_REPOSITORIES} | sed "s/,/ /g")
   do
-    sudo mount -t cvmfs ${repo} /cvmfs/${repo}
+    if [ ! -d /cvmfs/${repo} ]; then
+      sudo mount -t cvmfs ${repo} /cvmfs/${repo}
+    fi
   done
 elif [ "$(uname)" == "Darwin" ]; then
   # Mount CVMFS repositories (no autofs available)
