@@ -149,7 +149,7 @@ For example, you can add the following to your `devcontainer.json` to use this f
     "name": "CVMFS Action Dev",
     "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
     "features": {
-        "ghcr.io/cvmfs-contrib/features/cvmfs": {
+        "ghcr.io/cvmfs-contrib/github-action-cvmfs/cvmfs": {
             "CVMFS_REPOSITORIES": "sft.cern.ch"
         }
     }

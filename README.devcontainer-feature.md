@@ -29,7 +29,7 @@ This feature is intended to be published to the GitHub Container Registry (GHCR)
 4.  **Publish the Feature:**
     Run the following command from the root of this repository. The namespace should match the GitHub organization (`cvmfs-contrib`).
     ```bash
-    devcontainer features publish src/cvmfs --namespace cvmfs-contrib/
+    devcontainer features publish --namespace cvmfs-contrib/github-action-cvmfs .
     ```
 
 ### Automated Publishing

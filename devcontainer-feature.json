@@ -17,7 +17,7 @@
     "CVMFS_HTTP_PROXY": {
       "type": "string",
       "default": "DIRECT",
-      "description": "Chain of HTTP proxy groups used by CernVM-FS. Defaults to DIRECT)"
+      "description": "Chain of HTTP proxy groups used by CernVM-FS. Defaults to DIRECT."
     }
   },
   "entrypoint": "install-cvmfs-linux.sh"
