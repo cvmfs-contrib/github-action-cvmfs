@@ -1,0 +1,24 @@
+{
+  "name": "CVMFS",
+  "id": "cvmfs",
+  "version": "0.0.0",
+  "description": "Installs CVMFS client",
+  "options": {
+    "CVMFS_REPOSITORIES": {
+      "type": "string",
+      "default": "sft.cern.ch",
+      "description": "Comma-separated list of fully qualified repository names that shall be mountable under /cvmfs"
+    },
+    "CVMFS_CONFIG_PACKAGE": {
+      "type": "string",
+      "default": "cvmfs-config-default",
+      "description": "URL to the cvmfs config package to install"
+    },
+    "CVMFS_HTTP_PROXY": {
+      "type": "string",
+      "default": "DIRECT",
+      "description": "Chain of HTTP proxy groups used by CernVM-FS. Defaults to DIRECT)"
+    }
+  },
+  "entrypoint": "install-cvmfs-linux.sh"
+}
