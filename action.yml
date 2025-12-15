@@ -351,7 +351,7 @@ runs:
         ACTION_OWNER=$(basename $(dirname $(dirname "$GITHUB_ACTION_PATH")))
         echo "cvmfs_action_version=${ACTION_OWNER}_${ACTION_NAME}_${ACTION_VERSION}" >> $GITHUB_OUTPUT
       shell: bash
-    - uses: actions/cache@v4
+    - uses: actions/cache@v5
       with:
         key: cvmfs-apt-cache-${{ steps.lsb-release.outputs.id-release }}-${{ steps.lsb-release.outputs.arch }}-${{ steps.lsb-release.outputs.cvmfs_action_version }}
         path: |
