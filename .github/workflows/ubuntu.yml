@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, ubuntu-22.04, ubuntu-24.04]
+        os: [ubuntu-slim, ubuntu-latest, ubuntu-22.04, ubuntu-24.04]
     steps:
     - uses: actions/checkout@v6
     - uses: ./
