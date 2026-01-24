@@ -106,7 +106,7 @@ All optional parameters are set by default to `''`(empty string). All variables 
  - `cvmfs_quota_limit`: `'15000'` (see [GitHub Runner Hardware](https://docs.github.com/en/free-pro-team@latest/actions/reference/specifications-for-github-hosted-runners#supported-runners-and-hardware-resources) before changing)
  - `cvmfs_client_profile`: `'single'`
  - `cvmfs_use_cdn`: `'yes'`
- - `cvmfs_ubuntu_deb_location`: `https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest_all.deb`
+ - `cvmfs_ubuntu_deb_location`: `https://cvmrepo.s3.cern.ch/cvmrepo/apt/cvmfs-release-latest_all.deb`
  - `cvmfs_config_package`: `cvmfs-config-default`
 
 ## Minimal Example
