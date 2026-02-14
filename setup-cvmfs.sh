@@ -77,7 +77,16 @@ fi
 echo "::endgroup::"
 
 
-if [ "$(uname)" == "Darwin" ]; then
+if [ "$(uname)" == "Linux" ]; then
+  # Mount CVMFS repositories (in case no autofs)
+  for repo in $(echo ${CVMFS_REPOSITORIES} | sed "s/,/ /g")
+  do
+    if [ ! -d /cvmfs/${repo} ]; then
+      sudo mount -t cvmfs ${repo} /cvmfs/${repo}
+    fi
+  done
+elif [ "$(uname)" == "Darwin" ]; then
+  # Mount CVMFS repositories (no autofs available)
   for repo in $(echo ${CVMFS_REPOSITORIES} | sed "s/,/ /g")
   do
     mkdir -p /Users/Shared/cvmfs/${repo}
