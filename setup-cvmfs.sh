@@ -6,9 +6,12 @@ if [ "$(uname)" == "Linux" ]; then
   if [ -n "${APT_CACHE}" ]; then
     echo "::group::Using cache"
     echo "Copying cache from ${APT_CACHE} to system locations..."
-    mkdir -p ${APT_CACHE}/archives/ ${APT_CACHE}/lists/
+    mkdir -p ${APT_CACHE}/archives/
     sudo cp -r ${APT_CACHE}/archives /var/cache/apt
-    sudo cp -r ${APT_CACHE}/lists /var/lib/apt
+    if [ "${APT_CACHE_LISTS}" == "yes" ]; then
+      mkdir -p ${APT_CACHE}/lists/
+      sudo cp -r ${APT_CACHE}/lists /var/lib/apt
+    fi
     echo "::endgroup::"
   fi
   # install cvmfs release package
@@ -37,9 +40,12 @@ if [ "$(uname)" == "Linux" ]; then
   if [ -n "${APT_CACHE}" ]; then
     echo "::group::Updating cache"
     echo "Copying cache from system locations to ${APT_CACHE}..."
-    mkdir -p ${APT_CACHE}/archives/ ${APT_CACHE}/lists/
+    mkdir -p ${APT_CACHE}/archives/
     cp /var/cache/apt/archives/*.deb ${APT_CACHE}/archives/
-    cp /var/lib/apt/lists/*_dists_* ${APT_CACHE}/lists/
+    if [ "${APT_CACHE_LISTS}" == "yes" ]; then
+      mkdir -p ${APT_CACHE}/lists/
+      cp /var/lib/apt/lists/*_dists_* ${APT_CACHE}/lists/
+    fi
     echo "::endgroup::"
   fi
 elif [ "$(uname)" == "Darwin" ]; then
