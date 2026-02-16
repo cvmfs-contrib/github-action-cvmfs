@@ -8,6 +8,10 @@ inputs:
     description: 'Location (directory) of the user-space apt cache.'
     required: false
     default: 'apt_cache'
+  apt_cache_full:
+    description: 'If set to yes, cache APT package lists in addition to .deb packages. This speeds up the action, but may require manual intervention to clear the cache when gh actions runner images are updated'
+    required: false
+    default: 'no'
   cvmfs_alien_cache:
     description: 'If set, use an alien cache at the given location.'
     required: false
@@ -362,6 +366,7 @@ runs:
       env:
         ACTION_PATH: ${{ github.action_path }}
         APT_CACHE: ${{ inputs.apt_cache }}
+        APT_CACHE_LISTS: ${{ inputs.apt_cache_full }}
         CVMFS_ALIEN_CACHE: ${{ inputs.cvmfs_alien_cache }}
         CVMFS_ALT_ROOT_PATH: ${{ inputs.cvmfs_alt_root_path }}
         CVMFS_AUTHZ_HELPER: ${{ inputs.cvmfs_authz_helper }}
