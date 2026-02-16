@@ -26,7 +26,16 @@ if [ "$(uname)" == "Linux" ]; then
   echo "::group::Installing cvmfs"
   sudo rm -f /var/lib/man-db/auto-update
   sudo apt-get -q update
+  # Attempt install
   sudo apt-get -q -y install cvmfs
+  if [ $? -ne 0 ]; then
+    # If it fails, try to clear cache and try again
+    echo "First attempt to install cvmfs failed, trying to clear cache and retrying"
+    sudo rm -rf /var/cache/apt/archives
+    sudo rm -rf /var/cache/apt/lists
+    sudo apt-get -q update
+    sudo apt-get -q -y install cvmfs
+  fi
   # install cvmfs config package
   if [ "${CVMFS_CONFIG_PACKAGE}" == "cvmfs-config-default" ]; then
     sudo apt-get -q -y install cvmfs-config-default
