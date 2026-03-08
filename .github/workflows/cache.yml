@@ -1,0 +1,321 @@
+name: with actions_cache
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '21 6 * * *'
+
+env:
+  CVMFS_CACHE_BASE: /opt/cvmfs-cache
+
+jobs:
+  populate-cache:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./
+        with:
+          actions_cache: 'true'
+          cvmfs_cache_base: ${{ env.CVMFS_CACHE_BASE }}
+          cvmfs_repositories: 'sft.cern.ch'
+      - name: Diagnose workspace and cache base access before first access
+        run: |
+          cache_parent=$(dirname "${{ env.CVMFS_CACHE_BASE }}")
+          echo "### Compare workspace and cache path ancestry ###"
+          namei -l "${{ github.workspace }}" || true
+          namei -l "${cache_parent}" || true
+          namei -l "${{ env.CVMFS_CACHE_BASE }}" || true
+          echo "### Check action-prepared cache base permissions ###"
+          id
+          getent passwd cvmfs
+          ls -ld "${{ github.workspace }}" "${cache_parent}" "${{ env.CVMFS_CACHE_BASE }}"
+          test -r "${{ env.CVMFS_CACHE_BASE }}"
+          test -w "${{ env.CVMFS_CACHE_BASE }}"
+          sudo -u cvmfs test -w "${{ env.CVMFS_CACHE_BASE }}"
+      - name: Populate CernVM-FS cache
+        run: |
+          echo "### Dump default.local ###"
+          cat /etc/cvmfs/default.local
+          echo "### Check configured cache base ###"
+          grep "CVMFS_CACHE_BASE='${{ env.CVMFS_CACHE_BASE }}'" /etc/cvmfs/default.local
+          echo "### Service and mount state before first repository access ###"
+          sudo cvmfs_config chksetup || true
+          sudo systemctl status autofs --no-pager || true
+          mount | grep -E "autofs|cvmfs" || true
+          findmnt /cvmfs || true
+          findmnt /cvmfs/sft.cern.ch || true
+          echo "### Probe before first repository access ###"
+          set +e
+          sudo cvmfs_config probe
+          pre_probe_rc=$?
+          set -e
+          printf 'Pre-access probe exit code: %s\n' "${pre_probe_rc}"
+          if [ "${pre_probe_rc}" -ne 0 ]; then
+            echo "::warning::cvmfs_config probe failed before first repository access"
+          fi
+          echo "### Exercise /cvmfs/sft.cern.ch ###"
+          ls /cvmfs/sft.cern.ch
+          echo "### Check lcg/lastUpdate before the deeper cache exercise ###"
+          show_exact_target_io_diagnostics() {
+            echo "### journalctl: autofs unit ###"
+            sudo journalctl -u autofs --no-pager -n 100 || true
+            echo "### journalctl: filtered cvmfs/autofs/I-O lines ###"
+            sudo journalctl --no-pager -n 400 | grep -Ei 'cvmfs|autofs|Input/output|I/O error|sft\.cern\.ch' | tail -n 120 || true
+            if [ -f /var/log/syslog ]; then
+              echo "### /var/log/syslog: filtered cvmfs/autofs/I-O lines ###"
+              sudo tail -n 400 /var/log/syslog | grep -Ei 'cvmfs|autofs|Input/output|I/O error|sft\.cern\.ch' | tail -n 120 || true
+            fi
+          }
+          exact_update_marker=/cvmfs/sft.cern.ch/lcg/lastUpdate
+          if ! ls "${exact_update_marker}"; then
+            echo "::warning::Exact lcg/lastUpdate access failed; dumping CVMFS/autofs diagnostics before fallback"
+            show_exact_target_io_diagnostics
+          fi
+          echo "### Resolve a Bazel target to exercise broader cache content ###"
+          exact_bazel_bin=/cvmfs/sft.cern.ch/lcg/contrib/bazel/Linux-x86_64//lib/bazel/bin/bazel
+          if ! ls "${exact_bazel_bin}"; then
+            echo "::warning::Exact bazel access failed; dumping CVMFS/autofs diagnostics before fallback"
+            show_exact_target_io_diagnostics
+          fi
+          bazel_bin="${exact_bazel_bin}"
+          if [ ! -e "${bazel_bin}" ]; then
+            bazel_bin=$({
+              find /cvmfs/sft.cern.ch/lcg/contrib/bazel -path '*/Linux-x86_64*/lib/bazel/bin/bazel' -print 2>/dev/null
+              find /cvmfs/sft.cern.ch/lcg/contrib/bazel -path '*/lib/bazel/bin/bazel' -print 2>/dev/null
+            } | sort -u | tail -n 1)
+          fi
+          if [ -z "${bazel_bin}" ]; then
+            echo "::error::Could not find any fallback bazel binary under /cvmfs/sft.cern.ch/lcg/contrib/bazel"
+            exit 1
+          fi
+          bazel_bin_dir=${bazel_bin%/bazel}
+          bazel_root_dir=${bazel_bin_dir%/bin}
+          printf 'Selected bazel binary: %s\n' "${bazel_bin}"
+          echo "### Try the exact problematic ROOT libTree.so path without making it mandatory ###"
+          exact_root_lib=/cvmfs/sft.cern.ch/lcg/releases/ROOT/6.36.02-1f134/x86_64-ubuntu2404-gcc13-opt/lib/libTree.so
+          root_lib_for_read=
+          if ls "${exact_root_lib}"; then
+            root_lib_for_read="${exact_root_lib}"
+          else
+            echo "::warning::Exact ROOT libTree.so access failed; dumping CVMFS/autofs diagnostics and continuing without making it required"
+            show_exact_target_io_diagnostics
+          fi
+          echo "### Read the checked paths and nearby bazel files to populate more cached objects ###"
+          {
+            if [ -n "${root_lib_for_read}" ]; then
+              printf '%s\n' "${root_lib_for_read}"
+            fi
+            if [ -e "${exact_update_marker}" ]; then
+              printf '%s\n' "${exact_update_marker}"
+            fi
+            printf '%s\n' "${bazel_bin}"
+            find "${bazel_bin_dir}" -maxdepth 1 \( -type f -o -type l \) | sort
+            find "${bazel_root_dir}" -maxdepth 1 \( -type f -o -type l \) | sort
+          } | awk '!seen[$0]++' > "${RUNNER_TEMP}/bazel-files.txt"
+          test -s "${RUNNER_TEMP}/bazel-files.txt"
+          grep -F '/bin/bazel' "${RUNNER_TEMP}/bazel-files.txt"
+          while IFS= read -r path; do
+            cat "${path}" > /dev/null
+          done < "${RUNNER_TEMP}/bazel-files.txt"
+          printf 'Read %s bazel-related entries from %s\n' "$(wc -l < "${RUNNER_TEMP}/bazel-files.txt")" "${bazel_root_dir}"
+          echo "### Probe after first repository access ###"
+          set +e
+          sudo cvmfs_config probe
+          post_probe_rc=$?
+          set -e
+          printf 'Post-access probe exit code: %s\n' "${post_probe_rc}"
+          if [ "${pre_probe_rc}" -ne 0 ] && [ "${post_probe_rc}" -eq 0 ]; then
+            echo "Probe succeeded after first repository access"
+          fi
+          echo "### Service and mount state after first repository access ###"
+          mount | grep -E "autofs|cvmfs" || true
+          findmnt /cvmfs || true
+          findmnt /cvmfs/sft.cern.ch || true
+          sudo cvmfs_config status || true
+          echo "### Assert cache was populated ###"
+          sudo test -e "${{ env.CVMFS_CACHE_BASE }}/shared/cachedb"
+          populated_object=$(sudo find "${{ env.CVMFS_CACHE_BASE }}/shared" -mindepth 2 -maxdepth 2 -type f -path "${{ env.CVMFS_CACHE_BASE }}/shared/[0-9a-f][0-9a-f]/*" | head -n 1)
+          test -n "${populated_object}"
+          printf 'Populated cache object: %s\n' "${populated_object}"
+          echo "### Show selected cache entries ###"
+          sudo find "${{ env.CVMFS_CACHE_BASE }}/shared" -maxdepth 2 \( -name cachedb -o -name '[0-9a-f][0-9a-f]' \) | sort | head -n 40
+          if [ "${post_probe_rc}" -ne 0 ]; then
+            echo "::error::cvmfs_config probe still failed after first repository access"
+            exit "${post_probe_rc}"
+          fi
+      - name: Make CernVM-FS cache readable for actions/cache post-job save
+        if: ${{ always() }}
+        run: |
+          if [ -d "${{ env.CVMFS_CACHE_BASE }}" ]; then
+            sudo chmod -R a+rwX "${{ env.CVMFS_CACHE_BASE }}"
+            sudo find "${{ env.CVMFS_CACHE_BASE }}" -type d -exec chmod a+rwx {} +
+          fi
+
+  reuse-cache:
+    needs: populate-cache
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./
+        with:
+          actions_cache: 'true'
+          cvmfs_cache_base: ${{ env.CVMFS_CACHE_BASE }}
+          cvmfs_repositories: 'sft.cern.ch'
+      - name: Diagnose workspace and cache base access before reuse
+        run: |
+          cache_parent=$(dirname "${{ env.CVMFS_CACHE_BASE }}")
+          echo "### Compare workspace and cache path ancestry ###"
+          namei -l "${{ github.workspace }}" || true
+          namei -l "${cache_parent}" || true
+          namei -l "${{ env.CVMFS_CACHE_BASE }}" || true
+          echo "### Check action-prepared cache base permissions ###"
+          id
+          getent passwd cvmfs
+          ls -ld "${{ github.workspace }}" "${cache_parent}" "${{ env.CVMFS_CACHE_BASE }}"
+          test -r "${{ env.CVMFS_CACHE_BASE }}"
+          test -w "${{ env.CVMFS_CACHE_BASE }}"
+          sudo -u cvmfs test -w "${{ env.CVMFS_CACHE_BASE }}"
+          echo "### Check autofs / cvmfs setup ###"
+          sudo cvmfs_config chksetup || true
+          sudo systemctl is-active autofs || true
+          sudo systemctl status autofs --no-pager || true
+          findmnt /cvmfs || true
+          findmnt /cvmfs/sft.cern.ch || true
+      - name: Assert restored CernVM-FS cache contents
+        run: |
+          echo "### Check restored cache before first repository access ###"
+          sudo test -e "${{ env.CVMFS_CACHE_BASE }}/shared/cachedb"
+          restored_object=$(sudo find "${{ env.CVMFS_CACHE_BASE }}/shared" -mindepth 2 -maxdepth 2 -type f -path "${{ env.CVMFS_CACHE_BASE }}/shared/[0-9a-f][0-9a-f]/*" | head -n 1)
+          if [ -z "${restored_object}" ]; then
+            echo "Expected restored cache content under the persistent hash directories before first CVMFS access"
+            sudo find "${{ env.CVMFS_CACHE_BASE }}/shared" -maxdepth 2 \( -name cachedb -o -name '[0-9a-f][0-9a-f]' \) | sort | head -n 80
+            exit 1
+          fi
+          printf 'Restored cache object: %s\n' "${restored_object}"
+      - name: Reuse populated CernVM-FS cache
+        run: |
+          echo "### Dump default.local ###"
+          cat /etc/cvmfs/default.local
+          echo "### Try cvmfs_config probe ###"
+          if ! sudo cvmfs_config probe; then
+            echo "::warning::Initial cvmfs_config probe failed; dumping diagnostics, restarting autofs, and retrying once"
+            sudo systemctl status autofs --no-pager || true
+            findmnt /cvmfs || true
+            findmnt /cvmfs/sft.cern.ch || true
+            sudo systemctl restart autofs
+            sleep 2
+            sudo systemctl is-active autofs
+            sudo cvmfs_config probe
+          fi
+          show_cvmfs_talk_metrics() {
+            label="$1"
+            metrics_file="${RUNNER_TEMP}/cvmfs-${label}.prom"
+            echo "### cvmfs_talk metrics (${label}) ###"
+            sudo cvmfs_talk -i sft.cern.ch metrics prometheus > "${metrics_file}" || return 0
+            grep -Ei 'cvmfs_.*(cache|download|hit|rx)' "${metrics_file}" | head -n 40 || true
+          }
+          echo "### Reuse /cvmfs/sft.cern.ch ###"
+          ls /cvmfs/sft.cern.ch
+          echo "### Resolve the lcg/lastUpdate and bazel targets used for targeted reuse ###"
+          show_exact_target_io_diagnostics() {
+            echo "### journalctl: autofs unit ###"
+            sudo journalctl -u autofs --no-pager -n 100 || true
+            echo "### journalctl: filtered cvmfs/autofs/I-O lines ###"
+            sudo journalctl --no-pager -n 400 | grep -Ei 'cvmfs|autofs|Input/output|I/O error|sft\.cern\.ch' | tail -n 120 || true
+            if [ -f /var/log/syslog ]; then
+              echo "### /var/log/syslog: filtered cvmfs/autofs/I-O lines ###"
+              sudo tail -n 400 /var/log/syslog | grep -Ei 'cvmfs|autofs|Input/output|I/O error|sft\.cern\.ch' | tail -n 120 || true
+            fi
+          }
+          exact_update_marker=/cvmfs/sft.cern.ch/lcg/lastUpdate
+          if ! ls "${exact_update_marker}"; then
+            echo "::warning::Exact lcg/lastUpdate access failed; dumping CVMFS/autofs diagnostics before fallback"
+            show_exact_target_io_diagnostics
+          fi
+          exact_bazel_bin=/cvmfs/sft.cern.ch/lcg/contrib/bazel/Linux-x86_64//lib/bazel/bin/bazel
+          if ! ls "${exact_bazel_bin}"; then
+            echo "::warning::Exact bazel access failed; dumping CVMFS/autofs diagnostics before fallback"
+            show_exact_target_io_diagnostics
+          fi
+          bazel_bin="${exact_bazel_bin}"
+          if [ ! -e "${bazel_bin}" ]; then
+            bazel_bin=$({
+              find /cvmfs/sft.cern.ch/lcg/contrib/bazel -path '*/Linux-x86_64*/lib/bazel/bin/bazel' -print 2>/dev/null
+              find /cvmfs/sft.cern.ch/lcg/contrib/bazel -path '*/lib/bazel/bin/bazel' -print 2>/dev/null
+            } | sort -u | tail -n 1)
+          fi
+          if [ -z "${bazel_bin}" ]; then
+            echo "::error::Could not find any fallback bazel binary under /cvmfs/sft.cern.ch/lcg/contrib/bazel"
+            exit 1
+          fi
+          bazel_bin_dir=${bazel_bin%/bazel}
+          bazel_root_dir=${bazel_bin_dir%/bin}
+          printf 'Selected bazel binary: %s\n' "${bazel_bin}"
+          echo "### Try the exact problematic ROOT libTree.so path without making it mandatory ###"
+          exact_root_lib=/cvmfs/sft.cern.ch/lcg/releases/ROOT/6.36.02-1f134/x86_64-ubuntu2404-gcc13-opt/lib/libTree.so
+          root_lib_for_read=
+          if ls "${exact_root_lib}"; then
+            root_lib_for_read="${exact_root_lib}"
+          else
+            echo "::warning::Exact ROOT libTree.so access failed; dumping CVMFS/autofs diagnostics and continuing without making it required"
+            show_exact_target_io_diagnostics
+          fi
+          echo "### Inspect restored cache state via cvmfs_talk before targeted reuse ###"
+          sudo cvmfs_talk -i sft.cern.ch cache instance || true
+          sudo cvmfs_talk -i sft.cern.ch cache size || true
+          sudo cvmfs_talk -i sft.cern.ch cache list > "${RUNNER_TEMP}/cache-list-before.txt"
+          if [ -e "${exact_update_marker}" ]; then
+            if grep -F 'lastUpdate' "${RUNNER_TEMP}/cache-list-before.txt"; then
+              echo "lastUpdate already appears in cache list before the targeted reuse read"
+            else
+              echo "::notice::lastUpdate not yet visible in cache list before the targeted reuse read"
+            fi
+          else
+            echo "::notice::Skipping cache-list check for lcg/lastUpdate because the exact path is not currently available"
+          fi
+          if grep -F 'bazel' "${RUNNER_TEMP}/cache-list-before.txt"; then
+            echo "bazel already appears in cache list before the targeted reuse read"
+          else
+            echo "::notice::bazel not yet visible in cache list before the targeted reuse read"
+          fi
+          show_cvmfs_talk_metrics before-targeted-reuse
+          echo "### Re-read the checked paths and nearby bazel files to confirm cache reuse on richer content ###"
+          {
+            if [ -n "${root_lib_for_read}" ]; then
+              printf '%s\n' "${root_lib_for_read}"
+            fi
+            if [ -e "${exact_update_marker}" ]; then
+              printf '%s\n' "${exact_update_marker}"
+            fi
+            printf '%s\n' "${bazel_bin}"
+            find "${bazel_bin_dir}" -maxdepth 1 \( -type f -o -type l \) | sort
+            find "${bazel_root_dir}" -maxdepth 1 \( -type f -o -type l \) | sort
+          } | awk '!seen[$0]++' > "${RUNNER_TEMP}/bazel-files.txt"
+          test -s "${RUNNER_TEMP}/bazel-files.txt"
+          grep -F '/bin/bazel' "${RUNNER_TEMP}/bazel-files.txt"
+          while IFS= read -r path; do
+            cat "${path}" > /dev/null
+          done < "${RUNNER_TEMP}/bazel-files.txt"
+          printf 'Re-read %s bazel-related entries from %s\n' "$(wc -l < "${RUNNER_TEMP}/bazel-files.txt")" "${bazel_root_dir}"
+          echo "### Require checked paths in cvmfs_talk cache list during reuse ###"
+          sudo cvmfs_talk -i sft.cern.ch cache list > "${RUNNER_TEMP}/cache-list-after.txt"
+          if [ -e "${exact_update_marker}" ] && ! grep -F 'lastUpdate' "${RUNNER_TEMP}/cache-list-after.txt"; then
+            echo "::error::lastUpdate did not appear in cvmfs_talk cache list after the targeted reuse read"
+            sed -n '1,120p' "${RUNNER_TEMP}/cache-list-after.txt"
+            exit 1
+          fi
+          if ! grep -F 'bazel' "${RUNNER_TEMP}/cache-list-after.txt"; then
+            echo "::error::bazel did not appear in cvmfs_talk cache list after the targeted reuse read"
+            sed -n '1,120p' "${RUNNER_TEMP}/cache-list-after.txt"
+            exit 1
+          fi
+          show_cvmfs_talk_metrics after-targeted-reuse
+          echo "### Show selected cache entries ###"
+          sudo find "${{ env.CVMFS_CACHE_BASE }}/shared" -maxdepth 2 \( -name cachedb -o -name '[0-9a-f][0-9a-f]' \) | sort | head -n 40
+      - name: Make CernVM-FS cache readable for actions/cache post-job save
+        if: ${{ always() }}
+        run: |
+          if [ -d "${{ env.CVMFS_CACHE_BASE }}" ]; then
+            sudo chmod -R a+rwX "${{ env.CVMFS_CACHE_BASE }}"
+            sudo find "${{ env.CVMFS_CACHE_BASE }}" -type d -exec chmod a+rwx {} +
+          fi

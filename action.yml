@@ -12,6 +12,10 @@ inputs:
     description: 'If set to yes, cache APT package lists in addition to .deb packages. This speeds up the action, but may require manual intervention to clear the cache when gh actions runner images are updated'
     required: false
     default: 'no'
+  actions_cache:
+    description: 'Enable a GitHub Actions cache for persistent CernVM-FS cache contents under cvmfs_cache_base. With the default shared cache, cachedb and object directories live under the shared subdirectory.'
+    required: false
+    default: 'false'
   cvmfs_alien_cache:
     description: 'If set, use an alien cache at the given location.'
     required: false
@@ -41,7 +45,7 @@ inputs:
     required: false
     default: ''
   cvmfs_cache_base:
-    description: 'Location (directory) of the CernVM-FS cache.'
+    description: 'Location (directory) of the CernVM-FS cache. The cvmfs user must be able to traverse all parent directories and write this directory; on GitHub-hosted runners prefer a path such as /opt/cvmfs-cache so the action can prepare it for both the cvmfs user and the runner user.'
     required: false
     default: ''
   cvmfs_catalog_watermark:
@@ -360,6 +364,25 @@ runs:
         key: cvmfs-apt-cache-${{ steps.lsb-release.outputs.id-release }}-${{ steps.lsb-release.outputs.arch }}-${{ steps.lsb-release.outputs.cvmfs_action_version }}
         path: |
           ${{ inputs.apt_cache }}
+    - if: ${{ inputs.cvmfs_cache_base != '' }}
+      run: |
+        sudo mkdir -p "${{ inputs.cvmfs_cache_base }}"
+        sudo chmod a+rwx "${{ inputs.cvmfs_cache_base }}"
+      shell: bash
+    - uses: actions/cache@v5
+      if: ${{ inputs.actions_cache == 'true' && inputs.cvmfs_cache_base != '' && inputs.cvmfs_shared_cache != 'no' }}
+      with:
+        key: cvmfs-cache-${{ steps.lsb-release.outputs.id-release }}-${{ steps.lsb-release.outputs.arch }}-${{ steps.lsb-release.outputs.cvmfs_action_version }}
+        path: |
+          ${{ inputs.cvmfs_cache_base }}/shared/cachedb
+          ${{ inputs.cvmfs_cache_base }}/shared/[0-9a-f][0-9a-f]
+    - uses: actions/cache@v5
+      if: ${{ inputs.actions_cache == 'true' && inputs.cvmfs_cache_base != '' && inputs.cvmfs_shared_cache == 'no' }}
+      with:
+        key: cvmfs-cache-${{ steps.lsb-release.outputs.id-release }}-${{ steps.lsb-release.outputs.arch }}-${{ steps.lsb-release.outputs.cvmfs_action_version }}
+        path: |
+          ${{ inputs.cvmfs_cache_base }}/cachedb
+          ${{ inputs.cvmfs_cache_base }}/[0-9a-f][0-9a-f]
     - run: |
         ${{ github.action_path }}/setup-cvmfs.sh
       shell: bash

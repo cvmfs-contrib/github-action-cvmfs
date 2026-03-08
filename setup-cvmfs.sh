@@ -48,6 +48,28 @@ if [ "$(uname)" == "Linux" ]; then
     fi
     echo "::endgroup::"
   fi
+  if [ -n "${CVMFS_CACHE_BASE}" ]; then
+    echo "::group::Preparing cvmfs cache base"
+    mkdir -p "${CVMFS_CACHE_BASE}"
+    sudo chown -R cvmfs:root "${CVMFS_CACHE_BASE}"
+    sudo chmod -R a+rwX "${CVMFS_CACHE_BASE}"
+    sudo find "${CVMFS_CACHE_BASE}" -type d -exec chmod a+rwx {} +
+    id cvmfs
+    sudo -u cvmfs id
+    ls -ld "${CVMFS_CACHE_BASE}"
+    sudo -u cvmfs test -w "${CVMFS_CACHE_BASE}"
+    sudo -u cvmfs env CVMFS_CACHE_BASE="${CVMFS_CACHE_BASE}" bash <<'EOF'
+set -euo pipefail
+probe_file="${CVMFS_CACHE_BASE}/.cvmfs-write-probe"
+printf 'probe\n' > "${probe_file}"
+rm -f "${probe_file}"
+EOF
+    ls -ld "${CVMFS_CACHE_BASE}"
+    sudo find "${CVMFS_CACHE_BASE}" -mindepth 1 -maxdepth 1 | sort || true
+    test -r "${CVMFS_CACHE_BASE}"
+    test -w "${CVMFS_CACHE_BASE}"
+    echo "::endgroup::"
+  fi
 elif [ "$(uname)" == "Darwin" ]; then
   # Warn about the phasing out of MacOS support for this action
   echo "warning The CernVM-FS GitHub Action's support for MacOS  \
