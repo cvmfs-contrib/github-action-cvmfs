@@ -15,7 +15,7 @@ inputs:
   actions_cache:
     description: 'Enable a GitHub Actions cache for persistent CernVM-FS cache contents under cvmfs_cache_base. With the default shared cache, cachedb and object directories live under the shared subdirectory.'
     required: false
-    default: 'false'
+    default: 'true'
   cvmfs_alien_cache:
     description: 'If set, use an alien cache at the given location.'
     required: false
