@@ -15,7 +15,11 @@ inputs:
   actions_cache:
     description: 'Enable a GitHub Actions cache for persistent CernVM-FS cache contents under cvmfs_cache_base. With the default shared cache, cachedb and object directories live under the shared subdirectory.'
     required: false
-    default: 'true'
+    default: 'no'
+  cvmfs_cache_max_size:
+    description: 'Maximum size in MB of the CernVM-FS cache to persist in the GitHub Actions cache. Before saving, the cache is trimmed with cvmfs_talk cleanup. Set to 0 to disable trimming.'
+    required: false
+    default: '4096'
   cvmfs_alien_cache:
     description: 'If set, use an alien cache at the given location.'
     required: false
@@ -372,14 +376,18 @@ runs:
     - uses: actions/cache@v5
       if: ${{ inputs.actions_cache == 'true' && inputs.cvmfs_cache_base != '' && inputs.cvmfs_shared_cache != 'no' }}
       with:
-        key: cvmfs-cache-${{ steps.lsb-release.outputs.id-release }}-${{ steps.lsb-release.outputs.arch }}-${{ steps.lsb-release.outputs.cvmfs_action_version }}
+        key: cvmfs-cache-${{ steps.lsb-release.outputs.id-release }}-${{ steps.lsb-release.outputs.arch }}-${{ steps.lsb-release.outputs.cvmfs_action_version }}-${{ github.run_id }}
+        restore-keys: |
+          cvmfs-cache-${{ steps.lsb-release.outputs.id-release }}-${{ steps.lsb-release.outputs.arch }}-${{ steps.lsb-release.outputs.cvmfs_action_version }}-
         path: |
           ${{ inputs.cvmfs_cache_base }}/shared/cachedb
           ${{ inputs.cvmfs_cache_base }}/shared/[0-9a-f][0-9a-f]
     - uses: actions/cache@v5
       if: ${{ inputs.actions_cache == 'true' && inputs.cvmfs_cache_base != '' && inputs.cvmfs_shared_cache == 'no' }}
       with:
-        key: cvmfs-cache-${{ steps.lsb-release.outputs.id-release }}-${{ steps.lsb-release.outputs.arch }}-${{ steps.lsb-release.outputs.cvmfs_action_version }}
+        key: cvmfs-cache-${{ steps.lsb-release.outputs.id-release }}-${{ steps.lsb-release.outputs.arch }}-${{ steps.lsb-release.outputs.cvmfs_action_version }}-${{ github.run_id }}
+        restore-keys: |
+          cvmfs-cache-${{ steps.lsb-release.outputs.id-release }}-${{ steps.lsb-release.outputs.arch }}-${{ steps.lsb-release.outputs.cvmfs_action_version }}-
         path: |
           ${{ inputs.cvmfs_cache_base }}/cachedb
           ${{ inputs.cvmfs_cache_base }}/[0-9a-f][0-9a-f]
@@ -470,3 +478,14 @@ runs:
         CVMFS_UBUNTU_DEB_LOCATION: ${{ inputs.cvmfs_ubuntu_deb_location }}
         CVMFS_MACOS_PKG_LOCATION: ${{ inputs.cvmfs_macos_pkg_location }}
         CVMFS_CONFIG_PACKAGE: ${{ inputs.cvmfs_config_package }}
+    - if: ${{ inputs.actions_cache == 'true' && inputs.cvmfs_cache_base != '' && inputs.cvmfs_cache_max_size != '0' }}
+      run: |
+        # Trim the CernVM-FS cache to the configured maximum size
+        if [ -n "${{ inputs.cvmfs_repositories }}" ]; then
+          IFS=',' read -ra REPOS <<< "${{ inputs.cvmfs_repositories }}"
+          for repo in "${REPOS[@]}"; do
+            repo=$(echo "$repo" | xargs)  # trim whitespace
+            sudo cvmfs_talk -i "$repo" cleanup "${{ inputs.cvmfs_cache_max_size }}" 2>/dev/null || true
+          done
+        fi
+      shell: bash
