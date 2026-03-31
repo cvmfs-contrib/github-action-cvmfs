@@ -51,9 +51,20 @@ if [ "$(uname)" == "Linux" ]; then
   if [ -n "${CVMFS_CACHE_BASE}" ]; then
     echo "::group::Preparing cvmfs cache base"
     mkdir -p "${CVMFS_CACHE_BASE}"
+    # Ensure the shared sub-directory exists so default ACLs are set on it too
+    if [ "${CVMFS_SHARED_CACHE}" != "no" ]; then
+      mkdir -p "${CVMFS_CACHE_BASE}/shared"
+    fi
     sudo chown -R cvmfs:root "${CVMFS_CACHE_BASE}"
     sudo chmod -R a+rwX "${CVMFS_CACHE_BASE}"
     sudo find "${CVMFS_CACHE_BASE}" -type d -exec chmod a+rwx {} +
+    # Set default POSIX ACLs so that files/directories created later by the
+    # cvmfs user (during the job) are world-readable.  This is required for
+    # the actions/cache post-job save step, which runs as the runner user.
+    if command -v setfacl >/dev/null 2>&1; then
+      sudo setfacl -R -d -m o::rwX "${CVMFS_CACHE_BASE}"
+      sudo setfacl -R -m o::rwX "${CVMFS_CACHE_BASE}"
+    fi
     id cvmfs
     sudo -u cvmfs id
     ls -ld "${CVMFS_CACHE_BASE}"
