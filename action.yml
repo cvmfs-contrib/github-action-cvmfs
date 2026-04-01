@@ -49,7 +49,7 @@ inputs:
     required: false
     default: ''
   cvmfs_cache_base:
-    description: 'Location (directory) of the CernVM-FS cache. The cvmfs user must be able to traverse all parent directories and write this directory; on GitHub-hosted runners prefer a path such as /opt/cvmfs-cache so the action can prepare it for both the cvmfs user and the runner user. When actions_cache is true and this is left empty, it defaults to /opt/cvmfs-cache.'
+    description: 'Location (directory) of the CernVM-FS cache. The cvmfs user must be able to traverse all parent directories and write this directory. When actions_cache is true and this is left empty, it defaults to $HOME/.cache/cvmfs-cache.'
     required: false
     default: ''
   cvmfs_catalog_watermark:
@@ -347,7 +347,7 @@ runs:
       run: |
         cache_base="${{ inputs.cvmfs_cache_base }}"
         if [ -z "$cache_base" ] && [ "${{ inputs.actions_cache }}" == "true" ]; then
-          cache_base="/opt/cvmfs-cache"
+          cache_base="${HOME}/.cache/cvmfs-cache"
         fi
         echo "path=${cache_base}" >> $GITHUB_OUTPUT
       shell: bash

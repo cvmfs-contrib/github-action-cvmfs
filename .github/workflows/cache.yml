@@ -6,7 +6,7 @@ on:
     - cron: '21 6 * * *'
 
 env:
-  CVMFS_CACHE_BASE: /opt/cvmfs-cache
+  CVMFS_CACHE_BASE: ~/.cache/cvmfs-cache
 
 jobs:
   populate-cache:
