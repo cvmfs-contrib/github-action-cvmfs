@@ -347,7 +347,7 @@ runs:
       run: |
         cache_base="${{ inputs.cvmfs_cache_base }}"
         if [ -z "$cache_base" ] && [ "${{ inputs.actions_cache }}" == "true" ]; then
-          cache_base="${HOME}/.cache/cvmfs-cache"
+          cache_base="${HOME}/.cvmfs-cache"
         fi
         echo "path=${cache_base}" >> $GITHUB_OUTPUT
       shell: bash
