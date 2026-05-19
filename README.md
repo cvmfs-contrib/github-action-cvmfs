@@ -109,25 +109,7 @@ All optional parameters are set by default to `''`(empty string). All variables 
  - `cvmfs_ubuntu_deb_location`: `https://cvmrepo.s3.cern.ch/cvmrepo/apt/cvmfs-release-latest_all.deb`
  - `cvmfs_config_package`: `cvmfs-config-default`
 
-## Minimal Example
 
-The following minimal example, which is also a workflow in this repository at [.github/workflows/minimal-usage.yml](https://github.com/cvmfs-contrib/github-action-cvmfs/tree/main/.github/workflows/minimal-usage.yml), sets up CernVM-FS and lists the contents of the selected repositories from `*.cern.ch, *.egi.eu, *.opensciencegrid.org *.hsf.org`.
-```yaml
-name: Minimal usage
-on: [push, pull_request]
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: cvmfs-contrib/github-action-cvmfs@v4
-    - name: Test CernVM-FS
-      run: |
-        ls /cvmfs/lhcb.cern.ch
-        ls /cvmfs/auger.egi.eu
-        ls /cvmfs/dune.opensciencegrid.org
-        ls /cvmfs/sw.hsf.org
-        ls /cvmfs/sft.cern.ch
-```
 
 ## What Does This Action Do?
 
