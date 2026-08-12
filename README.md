@@ -139,6 +139,23 @@ This GitHub Action is only expected to work in workflows that [run on](https://d
 
  `windows` targets are not supported.
 
+## Devcontainer Usage
+
+This repository provide a Dev Container Feature to enable CernVM-FS in your Dev Containers. To use it, open this repository in a devcontainer-compatible editor like VS Code with the Dev Containers extension.
+
+For example, you can add the following to your `devcontainer.json` to use this feature:
+```json
+{
+    "name": "CVMFS Action Dev",
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+        "ghcr.io/cvmfs-contrib/github-action-cvmfs/cvmfs": {
+            "CVMFS_REPOSITORIES": "sft.cern.ch"
+        }
+    }
+}
+```
+
 ## Use With Docker
 
 In case your workflow uses docker containers, the cvmfs directory can be mounted inside the container by using the flag `-v /cvmfs:/cvmfs:shared`.
