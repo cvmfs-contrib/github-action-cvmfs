@@ -12,6 +12,14 @@ inputs:
     description: 'If set to yes, cache APT package lists in addition to .deb packages. This speeds up the action, but may require manual intervention to clear the cache when gh actions runner images are updated'
     required: false
     default: 'no'
+  actions_cache:
+    description: 'Enable a GitHub Actions cache for persistent CernVM-FS cache contents under cvmfs_cache_base. With the default shared cache, cachedb and object directories live under the shared subdirectory.'
+    required: false
+    default: 'no'
+  cvmfs_cache_max_size:
+    description: 'Maximum size in MB of the CernVM-FS cache to persist in the GitHub Actions cache. Before saving, the cache is trimmed with cvmfs_talk cleanup. Set to 0 to disable trimming.'
+    required: false
+    default: '4096'
   cvmfs_alien_cache:
     description: 'If set, use an alien cache at the given location.'
     required: false
@@ -41,7 +49,7 @@ inputs:
     required: false
     default: ''
   cvmfs_cache_base:
-    description: 'Location (directory) of the CernVM-FS cache.'
+    description: 'Location (directory) of the CernVM-FS cache. The cvmfs user must be able to traverse all parent directories and write this directory. When actions_cache is true and this is left empty, it defaults to $HOME/.cvmfs-cache.'
     required: false
     default: ''
   cvmfs_catalog_watermark:
@@ -335,6 +343,14 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - id: resolve-cache-base
+      run: |
+        cache_base="${{ inputs.cvmfs_cache_base }}"
+        if [ -z "$cache_base" ] && [ "${{ inputs.actions_cache }}" == "true" ]; then
+          cache_base="${HOME}/.cvmfs-cache"
+        fi
+        echo "path=${cache_base}" >> $GITHUB_OUTPUT
+      shell: bash
     - id: lsb-release
       run: |
         if [ "$RUNNER_OS" == "Linux" ]; then
@@ -360,6 +376,29 @@ runs:
         key: cvmfs-apt-cache-${{ steps.lsb-release.outputs.id-release }}-${{ steps.lsb-release.outputs.arch }}-${{ steps.lsb-release.outputs.cvmfs_action_version }}
         path: |
           ${{ inputs.apt_cache }}
+    - if: ${{ steps.resolve-cache-base.outputs.path != '' }}
+      run: |
+        sudo mkdir -p "${{ steps.resolve-cache-base.outputs.path }}"
+        sudo chmod a+rwx "${{ steps.resolve-cache-base.outputs.path }}"
+      shell: bash
+    - uses: actions/cache@v5
+      if: ${{ inputs.actions_cache == 'true' && steps.resolve-cache-base.outputs.path != '' && inputs.cvmfs_shared_cache != 'no' }}
+      with:
+        key: cvmfs-cache-${{ steps.lsb-release.outputs.id-release }}-${{ steps.lsb-release.outputs.arch }}-${{ steps.lsb-release.outputs.cvmfs_action_version }}-${{ github.run_id }}
+        restore-keys: |
+          cvmfs-cache-${{ steps.lsb-release.outputs.id-release }}-${{ steps.lsb-release.outputs.arch }}-${{ steps.lsb-release.outputs.cvmfs_action_version }}-
+        path: |
+          ${{ steps.resolve-cache-base.outputs.path }}/shared/cachedb
+          ${{ steps.resolve-cache-base.outputs.path }}/shared/[0-9a-f][0-9a-f]
+    - uses: actions/cache@v5
+      if: ${{ inputs.actions_cache == 'true' && steps.resolve-cache-base.outputs.path != '' && inputs.cvmfs_shared_cache == 'no' }}
+      with:
+        key: cvmfs-cache-${{ steps.lsb-release.outputs.id-release }}-${{ steps.lsb-release.outputs.arch }}-${{ steps.lsb-release.outputs.cvmfs_action_version }}-${{ github.run_id }}
+        restore-keys: |
+          cvmfs-cache-${{ steps.lsb-release.outputs.id-release }}-${{ steps.lsb-release.outputs.arch }}-${{ steps.lsb-release.outputs.cvmfs_action_version }}-
+        path: |
+          ${{ steps.resolve-cache-base.outputs.path }}/cachedb
+          ${{ steps.resolve-cache-base.outputs.path }}/[0-9a-f][0-9a-f]
     - run: |
         ${{ github.action_path }}/setup-cvmfs.sh
       shell: bash
@@ -374,7 +413,7 @@ runs:
         CVMFS_AUTO_UPDATE: ${{ inputs.cvmfs_auto_update }}
         CVMFS_BACKOFF_INIT: ${{ inputs.cvmfs_backoff_init }}
         CVMFS_BACKOFF_MAX: ${{ inputs.cvmfs_backoff_max }}
-        CVMFS_CACHE_BASE: ${{ inputs.cvmfs_cache_base }}
+        CVMFS_CACHE_BASE: ${{ steps.resolve-cache-base.outputs.path }}
         CVMFS_CATALOG_WATERMARK: ${{ inputs.cvmfs_catalog_watermark }}
         CVMFS_CHECK_PERMISSIONS: ${{ inputs.cvmfs_check_permissions }}
         CVMFS_CLAIM_OWNERSHIP: ${{ inputs.cvmfs_claim_ownership }}
@@ -447,3 +486,14 @@ runs:
         CVMFS_UBUNTU_DEB_LOCATION: ${{ inputs.cvmfs_ubuntu_deb_location }}
         CVMFS_MACOS_PKG_LOCATION: ${{ inputs.cvmfs_macos_pkg_location }}
         CVMFS_CONFIG_PACKAGE: ${{ inputs.cvmfs_config_package }}
+    - if: ${{ inputs.actions_cache == 'true' && steps.resolve-cache-base.outputs.path != '' && inputs.cvmfs_cache_max_size != '0' }}
+      run: |
+        # Trim the CernVM-FS cache to the configured maximum size
+        if [ -n "${{ inputs.cvmfs_repositories }}" ]; then
+          IFS=',' read -ra REPOS <<< "${{ inputs.cvmfs_repositories }}"
+          for repo in "${REPOS[@]}"; do
+            repo=$(echo "$repo" | xargs)  # trim whitespace
+            sudo cvmfs_talk -i "$repo" cleanup "${{ inputs.cvmfs_cache_max_size }}" 2>/dev/null || true
+          done
+        fi
+      shell: bash
