@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, macos-14, macos-15]
+        os: [macos-latest, macos-14, macos-15, macos-26, xcode-27]
     steps:
     - uses: actions/checkout@v7
     - uses: ./
