@@ -54,6 +54,7 @@ elif [ "$(uname)" == "Darwin" ]; then
         is still experimental."
 
   brew tap macos-fuse-t/cask
+  brew trust macos-fuse-t/cask
   brew tap cvmfs/homebrew-cvmfs
   brew trust cvmfs/cvmfs
   brew install cvmfs
