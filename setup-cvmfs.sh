@@ -55,6 +55,7 @@ elif [ "$(uname)" == "Darwin" ]; then
 
   brew tap macos-fuse-t/cask
   brew tap cvmfs/homebrew-cvmfs
+  brew trust cvmfs/cvmfs
   brew install cvmfs
 
 
