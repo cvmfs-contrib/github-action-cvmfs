@@ -2,6 +2,7 @@ name: with cvmfs_config_package
 on:
   push:
   pull_request:
+  workflow_dispatch:
   schedule:
     - cron:  '22 2 * * *'
 jobs:

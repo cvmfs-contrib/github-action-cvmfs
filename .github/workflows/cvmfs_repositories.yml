@@ -2,6 +2,7 @@ name: with cvmfs_repositories
 on:
   push:
   pull_request:
+  workflow_dispatch:
   schedule:
     - cron:  '55 5 * * *'
 jobs:

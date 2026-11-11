@@ -2,6 +2,7 @@ name: with cvmfs_http_proxy
 on:
   push:
   pull_request:
+  workflow_dispatch:
   schedule:
     - cron:  '11 1 * * *'
 jobs:
