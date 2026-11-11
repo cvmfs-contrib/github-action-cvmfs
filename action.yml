@@ -188,10 +188,6 @@ inputs:
     description: 'Size of the CernVM-FS meta-data memory cache in Megabytes.'
     required: false
     default: ''
-  cvmfs_mount_backend:
-    description: 'macOS only: mount backend (nfs, fuse, fskit). Defaults to the package default (nfs), the only backend that works on GitHub-hosted macOS runners.'
-    required: false
-    default: ''
   cvmfs_mount_rw:
     description: 'Mount CernVM-FS as a read/write file system. Write operations will fail but this option can workaround faulty open() flags.'
     required: false
@@ -419,7 +415,6 @@ runs:
         CVMFS_MAX_SERVERS: ${{ inputs.cvmfs_max_servers }}
         CVMFS_MAX_TTL: ${{ inputs.cvmfs_max_ttl }}
         CVMFS_MEMCACHE_SIZE: ${{ inputs.cvmfs_memcache_size }}
-        CVMFS_MOUNT_BACKEND: ${{ inputs.cvmfs_mount_backend }}
         CVMFS_MOUNT_RW: ${{ inputs.cvmfs_mount_rw }}
         CVMFS_NFILES: ${{ inputs.cvmfs_nfiles }}
         CVMFS_NFS_INTERLEAVED_INODES: ${{ inputs.cvmfs_nfs_interleaved_inodes }}

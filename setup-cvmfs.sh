@@ -86,6 +86,11 @@ fi
 
 ${ACTION_PATH}/createConfig.sh
 
+if [ "$(uname)" == "Darwin" ]; then
+  # The NFS backend is the only one that works on GitHub-hosted macOS runners
+  echo "CVMFS_MOUNT_BACKEND=nfs" | sudo tee -a /etc/cvmfs/default.local
+fi
+
 echo "::group::Running cvmfs_config setup"
 sudo cvmfs_config setup
 retCongif=$?

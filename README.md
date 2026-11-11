@@ -64,7 +64,6 @@ The following parameters are supported:
 - `cvmfs_max_servers`: Limit the number of (geo sorted) stratum 1 servers that are effectively used.
 - `cvmfs_max_ttl`: Maximum file catalog TTL in minutes. Can overwrite the TTL stored in the catalog.
 - `cvmfs_memcache_size`: Size of the CernVM-FS meta-data memory cache in Megabyte.
-- `cvmfs_mount_backend`: macOS only. Mount backend (`nfs`, `fuse`, `fskit`). Defaults to the package default (`nfs`), which is the only backend that works on GitHub-hosted macOS runners.
 - `cvmfs_mount_rw`: Mount CernVM-FS as a read/write file system. Write operations will fail but this option can workaround faulty `open()` flags.
 - `cvmfs_nfiles`: Maximum number of open file descriptors that can be used by the CernVM-FS process.
 - `cvmfs_nfs_interleaved_inodes`: In NFS mode, use only inodes of the form an+b, specified as “b%a”.
