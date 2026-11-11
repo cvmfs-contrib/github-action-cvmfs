@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 
+# Report a failed setup command and abort with its exit code
+fail() {
+  local ret=$1
+  shift
+  echo "::endgroup::"
+  echo "::error::github-action-cvmfs: $* failed with exit code ${ret}"
+  exit ${ret}
+}
+
 # Platform specific install
 if [ "$(uname)" == "Linux" ]; then
   # download from cache
@@ -18,21 +27,23 @@ if [ "$(uname)" == "Linux" ]; then
   echo "::group::Installing cvmfs-release"
   APT_ARCHIVES=/var/cache/apt/archives/
   if [ ! -f ${APT_ARCHIVES}/cvmfs-release-latest_all.deb ] ; then
-    sudo curl -L -o ${APT_ARCHIVES}/cvmfs-release-latest_all.deb ${CVMFS_UBUNTU_DEB_LOCATION}
+    sudo curl -L -o ${APT_ARCHIVES}/cvmfs-release-latest_all.deb ${CVMFS_UBUNTU_DEB_LOCATION} \
+      || fail $? "downloading cvmfs-release"
   fi
-  sudo dpkg -i ${APT_ARCHIVES}/cvmfs-release-latest_all.deb
+  sudo dpkg -i ${APT_ARCHIVES}/cvmfs-release-latest_all.deb || fail $? "installing cvmfs-release"
   echo "::endgroup::"
   # install cvmfs package
   echo "::group::Installing cvmfs"
   sudo rm -f /var/lib/man-db/auto-update
   sudo apt-get -q update
-  sudo apt-get -q -y install cvmfs
+  sudo apt-get -q -y install cvmfs || fail $? "apt-get install cvmfs"
   # install cvmfs config package
   if [ "${CVMFS_CONFIG_PACKAGE}" == "cvmfs-config-default" ]; then
-    sudo apt-get -q -y install cvmfs-config-default
+    sudo apt-get -q -y install cvmfs-config-default || fail $? "apt-get install cvmfs-config-default"
   else
-    sudo curl -L -o ${APT_ARCHIVES}/cvmfs-config.deb ${CVMFS_CONFIG_PACKAGE}
-    sudo dpkg -i ${APT_ARCHIVES}/cvmfs-config.deb
+    sudo curl -L -o ${APT_ARCHIVES}/cvmfs-config.deb ${CVMFS_CONFIG_PACKAGE} \
+      || fail $? "downloading ${CVMFS_CONFIG_PACKAGE}"
+    sudo dpkg -i ${APT_ARCHIVES}/cvmfs-config.deb || fail $? "installing ${CVMFS_CONFIG_PACKAGE}"
   fi
   sudo touch /var/lib/man-db/auto-update
   echo "::endgroup::"
