@@ -44,6 +44,7 @@ declare -a vars=(CVMFS_ALIEN_CACHE
                  CVMFS_MAX_SERVERS
                  CVMFS_MAX_TTL
                  CVMFS_MEMCACHE_SIZE
+                 CVMFS_MOUNT_BACKEND
                  CVMFS_MOUNT_RW
                  CVMFS_NFILES
                  CVMFS_NFS_INTERLEAVED_INODES

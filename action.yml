@@ -188,6 +188,10 @@ inputs:
     description: 'Size of the CernVM-FS meta-data memory cache in Megabytes.'
     required: false
     default: ''
+  cvmfs_mount_backend:
+    description: 'macOS only: mount backend (nfs, fuse, fskit). Defaults to the package default (nfs), the only backend that works on GitHub-hosted macOS runners.'
+    required: false
+    default: ''
   cvmfs_mount_rw:
     description: 'Mount CernVM-FS as a read/write file system. Write operations will fail but this option can workaround faulty open() flags.'
     required: false
@@ -324,6 +328,10 @@ inputs:
     description: 'Location from where to download the Ubuntu deb package of CernVM-FS'
     required: false
     default: 'https://cvmrepo.s3.cern.ch/cvmrepo/apt/cvmfs-release-latest_all.deb'
+  cvmfs_macos_pkg_location:
+    description: 'Location from where to download the macOS pkg of CernVM-FS'
+    required: false
+    default: 'https://ecsft.cern.ch/dist/cvmfs/prerelease/cvmfs-2.15.0-pre1/cvmfs-2.15.0~pre1.pkg'
   cvmfs_config_package:
     description: 'URL to the cvmfs config package to install'
     required: false
@@ -411,6 +419,7 @@ runs:
         CVMFS_MAX_SERVERS: ${{ inputs.cvmfs_max_servers }}
         CVMFS_MAX_TTL: ${{ inputs.cvmfs_max_ttl }}
         CVMFS_MEMCACHE_SIZE: ${{ inputs.cvmfs_memcache_size }}
+        CVMFS_MOUNT_BACKEND: ${{ inputs.cvmfs_mount_backend }}
         CVMFS_MOUNT_RW: ${{ inputs.cvmfs_mount_rw }}
         CVMFS_NFILES: ${{ inputs.cvmfs_nfiles }}
         CVMFS_NFS_INTERLEAVED_INODES: ${{ inputs.cvmfs_nfs_interleaved_inodes }}

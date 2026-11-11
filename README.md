@@ -64,6 +64,7 @@ The following parameters are supported:
 - `cvmfs_max_servers`: Limit the number of (geo sorted) stratum 1 servers that are effectively used.
 - `cvmfs_max_ttl`: Maximum file catalog TTL in minutes. Can overwrite the TTL stored in the catalog.
 - `cvmfs_memcache_size`: Size of the CernVM-FS meta-data memory cache in Megabyte.
+- `cvmfs_mount_backend`: macOS only. Mount backend (`nfs`, `fuse`, `fskit`). Defaults to the package default (`nfs`), which is the only backend that works on GitHub-hosted macOS runners.
 - `cvmfs_mount_rw`: Mount CernVM-FS as a read/write file system. Write operations will fail but this option can workaround faulty `open()` flags.
 - `cvmfs_nfiles`: Maximum number of open file descriptors that can be used by the CernVM-FS process.
 - `cvmfs_nfs_interleaved_inodes`: In NFS mode, use only inodes of the form an+b, specified as “b%a”.
@@ -98,6 +99,7 @@ The following parameters are supported:
 - `cvmfs_usyslog`: All messages that are normally logged to syslog are re-directed to the given file. This file can grow up to 500kB and there is one step of log rotation. Required for $mu$CernVM.
 - `cvmfs_workspace`: Set the local directory for storing special files (defaults to the cache directory).
 - `cvmfs_ubuntu_deb_location`: Location from where to download the Ubuntu deb package of CernVM-FS.
+- `cvmfs_macos_pkg_location`: Location from where to download the macOS pkg of CernVM-FS.
 - `cvmfs_config_package`: URL to the cvmfs config package to install.
 - `run_local_checkout`: Run the local checkout of the action and not the main repo code. Only used for testing and development of this action (needed in CI).
 
@@ -107,6 +109,7 @@ All optional parameters are set by default to `''`(empty string). All variables 
  - `cvmfs_client_profile`: `'single'`
  - `cvmfs_use_cdn`: `'yes'`
  - `cvmfs_ubuntu_deb_location`: `https://cvmrepo.s3.cern.ch/cvmrepo/apt/cvmfs-release-latest_all.deb`
+ - `cvmfs_macos_pkg_location`: `https://ecsft.cern.ch/dist/cvmfs/prerelease/cvmfs-2.15.0-pre1/cvmfs-2.15.0~pre1.pkg`
  - `cvmfs_config_package`: `cvmfs-config-default`
 
 
@@ -118,6 +121,17 @@ This GitHub Action installs the [CernVM-FS package](https://cernvm.cern.ch/fs/#d
 ## Limitations
 
 This GitHub Action is only expected to work in workflows that [run on](https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on) ubuntu. There is experimental support for `macOS` (11+).
+
+### macOS
+
+On macOS the action installs the CernVM-FS macOS package (currently the 2.15.0 pre-release). The package uses the [NFS backend](https://cvmfs.readthedocs.io/en/latest/cpt-macos/#nfs-backend-preferred): `cvmfs2` serves each repository over NFSv4 on `127.0.0.1`, and the macOS kernel NFS client mounts it. No macFUSE or FUSE-T is needed. macOS has no autofs, so only the repositories listed in `cvmfs_repositories` (plus the config repository) are mounted, for example:
+```yaml
+    - uses: cvmfs-contrib/github-action-cvmfs@v5
+      with:
+        cvmfs_repositories: 'sft.cern.ch'
+    - run: ls /cvmfs/sft.cern.ch/
+```
+Repositories are available under `/cvmfs` (a firmlink to `/Volumes/cvmfs`) and, for compatibility, under `/Users/Shared/cvmfs`.
 
  `windows` targets are not supported.
 

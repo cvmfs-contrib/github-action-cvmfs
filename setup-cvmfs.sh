@@ -60,23 +60,24 @@ if [ "$(uname)" == "Linux" ]; then
     echo "::endgroup::"
   fi
 elif [ "$(uname)" == "Darwin" ]; then
-  # Warn about the phasing out of MacOS support for this action
-  echo "warning The CernVM-FS GitHub Action's support for MacOS  \
-        is still experimental."
+  echo "::warning::github-action-cvmfs: macOS support is experimental."
 
-  brew tap macos-fuse-t/cask
-  brew trust macos-fuse-t/cask
-  brew tap cvmfs/homebrew-cvmfs
-  brew trust cvmfs/cvmfs
-  brew install cvmfs
-
-
-  # / is readonly on macos 11+ - do 'synthetic firmlink' to create /cvmfs
-  sudo zsh -c 'echo -e "cvmfs\tUsers/Shared/cvmfs\n#comment\n" > /etc/synthetic.conf'
-  sudo chown root:wheel /etc/synthetic.conf
-  sudo chmod a+r /etc/synthetic.conf
-  # apfs.util seems to return non-zero error codes also on success
-  sudo /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t || true
+  # Install the CernVM-FS macOS package. Since 2.15 it provides an NFS backend
+  # that relies only on the kernel NFS client and works on GitHub runners.
+  # The package post-install runs 'cvmfs_config setup', which creates the
+  # /cvmfs -> /Volumes/cvmfs firmlink and the /Users/Shared/cvmfs symlink.
+  echo "::group::Installing cvmfs"
+  PKG_CACHE=${APT_CACHE:-${RUNNER_TEMP:-/tmp}}/pkg
+  PKG_FILE="${PKG_CACHE}/$(basename "${CVMFS_MACOS_PKG_LOCATION}")"
+  mkdir -p "${PKG_CACHE}"
+  if [ ! -f "${PKG_FILE}" ]; then
+    curl -fL -o "${PKG_FILE}" "${CVMFS_MACOS_PKG_LOCATION}" \
+      || { rm -f "${PKG_FILE}"; fail 1 "downloading ${CVMFS_MACOS_PKG_LOCATION}"; }
+  fi
+  sudo installer -pkg "${PKG_FILE}" -target / || fail $? "installing ${PKG_FILE}"
+  # Workloads that open many files may need a higher limit
+  sudo launchctl limit maxfiles 65536 65536 || true
+  echo "::endgroup::"
 
 else
   echo "Unsupported platform"
@@ -97,11 +98,19 @@ echo "::endgroup::"
 
 
 if [ "$(uname)" == "Darwin" ]; then
-  for repo in $(echo ${CVMFS_REPOSITORIES} | sed "s/,/ /g")
+  echo "::group::Mounting repositories"
+  sudo cvmfs_config chksetup || echo "::warning::github-action-cvmfs: cvmfs_config chksetup reported problems"
+  # There is no autofs on macOS: every repository is mounted explicitly,
+  # starting with the config repository (if any).
+  CONFIG_REPO=$(cat /etc/cvmfs/default.conf /etc/cvmfs/default.d/*.conf /etc/cvmfs/default.local 2>/dev/null \
+    | sed -n "s/^[[:space:]]*CVMFS_CONFIG_REPOSITORY=[\"']*\([^\"']*\)[\"']*.*/\1/p" | tail -n 1)
+  for repo in ${CONFIG_REPO} $(echo ${CVMFS_REPOSITORIES} | sed "s/,/ /g")
   do
-    mkdir -p /Users/Shared/cvmfs/${repo}
-    sudo mount -t cvmfs ${repo} /Users/Shared/cvmfs/${repo}
+    if mount | grep -q " on /Volumes/cvmfs/${repo} "; then
+      continue
+    fi
+    mkdir -p /cvmfs/${repo} || fail $? "creating /cvmfs/${repo}"
+    sudo mount -t cvmfs ${repo} /cvmfs/${repo} || fail $? "mounting ${repo}"
   done
-  # Fuse-t can have a brief lag after mounting  before the mountpoint responds 
-  sleep 3
+  echo "::endgroup::"
 fi
