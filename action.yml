@@ -324,6 +324,10 @@ inputs:
     description: 'Location from where to download the Ubuntu deb package of CernVM-FS'
     required: false
     default: 'https://cvmrepo.s3.cern.ch/cvmrepo/apt/cvmfs-release-latest_all.deb'
+  cvmfs_macos_pkg_location:
+    description: 'Location from where to download the macOS pkg of CernVM-FS'
+    required: false
+    default: 'https://ecsft.cern.ch/dist/cvmfs/prerelease/cvmfs-2.15.0-pre1/cvmfs-2.15.0~pre1.pkg'
   cvmfs_config_package:
     description: 'URL to the cvmfs config package to install'
     required: false
