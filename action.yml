@@ -327,7 +327,7 @@ inputs:
   cvmfs_macos_pkg_location:
     description: 'Location from where to download the macOS pkg of CernVM-FS'
     required: false
-    default: 'https://ecsft.cern.ch/dist/cvmfs/prerelease/cvmfs-2.15.0-pre4/cvmfs-2.15.0~pre4.pkg'
+    default: 'https://ecsft.cern.ch/dist/cvmfs/prerelease/cvmfs-2.15.0-pre5/cvmfs-2.15.0~pre5.pkg'
   cvmfs_config_package:
     description: 'URL to the cvmfs config package to install'
     required: false
