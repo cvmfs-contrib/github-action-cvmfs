@@ -108,7 +108,7 @@ All optional parameters are set by default to `''`(empty string). All variables 
  - `cvmfs_client_profile`: `'single'`
  - `cvmfs_use_cdn`: `'yes'`
  - `cvmfs_ubuntu_deb_location`: `https://cvmrepo.s3.cern.ch/cvmrepo/apt/cvmfs-release-latest_all.deb`
- - `cvmfs_macos_pkg_location`: `https://ecsft.cern.ch/dist/cvmfs/prerelease/cvmfs-2.15.0-pre4/cvmfs-2.15.0~pre4.pkg`
+ - `cvmfs_macos_pkg_location`: `https://ecsft.cern.ch/dist/cvmfs/prerelease/cvmfs-2.15.0-pre5/cvmfs-2.15.0~pre5.pkg`
  - `cvmfs_config_package`: `cvmfs-config-default`
 
 
